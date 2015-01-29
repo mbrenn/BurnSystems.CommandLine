@@ -28,8 +28,8 @@ It is necessary to give the command line parser a hint, so it connects the input
 
     public static void Main(string[] args) {
        var evaluator = new CommandLineEvaluator(args)
-        .WithArgument("input", HasValue: true)
-        .WithArgument("output", HasValue: true);
+        .WithArgument("input", hasValue: true)
+        .WithArgument("output", hasValue: true);
     }
 
 This will make the evaluator return the following two named arguments: 

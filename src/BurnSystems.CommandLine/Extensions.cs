@@ -23,5 +23,14 @@ namespace BurnSystems.CommandLine
 
             return evaluator;
         }
+
+        public static CommandLineEvaluator WithArgument(
+            this CommandLineEvaluator evaluator,
+            string name,
+            bool hasValue = false,
+            string helpText = "")
+        {
+            throw new InvalidOperationException();
+        }
     }
 }
