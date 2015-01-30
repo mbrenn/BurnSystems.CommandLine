@@ -27,6 +27,21 @@ namespace BurnSystems.CommandLine.Test
         }
 
         [Test]
+        public void TestShortName()
+        {
+            var args = new string[] { "-i", "input.txt", "-o", "output.txt" };
+            var evaluator = new CommandLineEvaluator(args)
+                .WithArgument("input", hasValue: true, shortName: 'i')
+                .WithArgument("output", hasValue: true, shortName: 'o');
+
+            Assert.That(evaluator.NamedArguments.Count, Is.EqualTo(2));
+            Assert.That(evaluator.UnnamedArguments.Count, Is.EqualTo(0));
+
+            Assert.That(evaluator.NamedArguments["input"], Is.EqualTo("input.txt"));
+            Assert.That(evaluator.NamedArguments["output"], Is.EqualTo("output.txt"));
+        }
+
+        [Test]
         public void TestIncompleteNamedAndUnnamedArguments()
         {
             var args = new string[] { "--input", "input.txt", "--output" };

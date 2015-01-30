@@ -124,7 +124,7 @@ namespace BurnSystems.CommandLine
         /// Adds the information for one argument
         /// </summary>
         /// <param name="info">Information to be added</param>
-        public void Add(ArgumentInfo info)
+        public void AddArgumentInfo(ArgumentInfo info)
         {
             this.argumentInfos.Add(info);
         }
@@ -206,37 +206,34 @@ namespace BurnSystems.CommandLine
                     continue;
                 }
 
-                string argumentName = null;
                 if (argument.StartsWith("--", StringComparison.Ordinal))
                 {
-                    argumentName = argument.Substring(2);
+                    var argumentName = argument.Substring(2);
+                    n = AddValueToNamedArgument(n, argumentName);
                 }
                 else if (argument[0] == '-')
                 {
-                    argumentName = argument.Substring(1);
-                }
+                    var argumentName = argument.Substring(1);
 
-                if (argumentName != null)
-                {
-                    // Supports the named arguments with values
-                    var info = 
-                        this.argumentInfos.Where(x => x.LongName == argumentName).FirstOrDefault();
-
-                    if (info == null || !info.HasValue)
+                    foreach (var cChar in argumentName)
                     {
-                        this.namedArguments[argumentName] = "1";
-                    }
-                    else
-                    {
-                        n++;
-                        if (arguments.Length <= n)
+                        var info = this.argumentInfos.Where(x => x.ShortName == cChar).FirstOrDefault();
+                        if (info == null || !info.HasValue)
                         {
-                            this.AddError(
-                                "Value missing for parameter: " + argumentName);
+                            this.NamedArguments[argumentName] = "1";
+                        }
+                        else if (!info.HasValue)
+                        {
+                            this.NamedArguments[info.LongName] = "1";
                         }
                         else
                         {
-                            this.namedArguments[argumentName] = arguments[n];
+                            if (argumentName.Length > 1)
+                            {
+                                this.AddError("Shortname " + cChar + " has a value and is used with other options");
+                            }
+
+                            n = this.AddValueToNamedArgument(n, info.LongName);
                         }
                     }
                 }
@@ -250,6 +247,38 @@ namespace BurnSystems.CommandLine
             {
                 filter.AfterParsing(this);
             }
+        }
+
+        /// <summary>
+        /// Adds a value to a named argument
+        /// </summary>
+        /// <param name="n">Position, where the argument name was found</param>
+        /// <param name="argumentName">Name of the argument being used</param>
+        /// <returns>The new position to be used for the parsing</returns>
+        private int AddValueToNamedArgument(int n, string argumentName)
+        {
+            // Supports the named arguments with values
+            var info =
+                this.argumentInfos.Where(x => x.LongName == argumentName).FirstOrDefault();
+
+            if (info == null || !info.HasValue)
+            {
+                this.namedArguments[argumentName] = "1";
+            }
+            else
+            {
+                n++;
+                if (arguments.Length <= n)
+                {
+                    this.AddError(
+                        "Value missing for parameter: " + argumentName);
+                }
+                else
+                {
+                    this.namedArguments[argumentName] = arguments[n];
+                }
+            }
+            return n;
         }
 
         /// <summary>

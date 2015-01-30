@@ -43,7 +43,7 @@ namespace BurnSystems.CommandLine
             argument.HelpText = helpText;
             argument.DefaultValue = defaultValue;
 
-            evaluator.Add(argument);
+            evaluator.AddArgumentInfo(argument);
 
             return evaluator;
             
