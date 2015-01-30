@@ -18,13 +18,21 @@ namespace BurnSystems.CommandLine
             new List<string>();
 
         /// <summary>
-        /// Benannte Argumente
+        /// Stores the argument information
+        /// </summary>
+        private List<ArgumentInfo> argumentInfos = new List<ArgumentInfo>();
+
+        /// <summary>
+        /// Named arguments
         /// </summary>
         private Dictionary<string, string> namedArguments =
             new Dictionary<string, string>();
 
-        private List<ICommandLineDefinition> definitions =
-            new List<ICommandLineDefinition>();
+        /// <summary>
+        /// Stores the definitions, which will be replaced
+        /// </summary>
+        private List<ICommandLineFilter> filters =
+            new List<ICommandLineFilter>();
 
         /// <summary>
         /// Stores the value whether the parsing already had been executed
@@ -37,6 +45,14 @@ namespace BurnSystems.CommandLine
         private string[] arguments;
 
         /// <summary>
+        /// Returns the argument information
+        /// </summary>
+        public IEnumerable<ArgumentInfo> ArgumentInfos
+        {
+            get { return this.argumentInfos; }
+        }
+
+        /// <summary>
         /// Initializes a new instance of the CommandLineEvaluator class.
         /// </summary>
         /// <param name="arguments">List of program arguments</param>
@@ -46,6 +62,9 @@ namespace BurnSystems.CommandLine
             Contract.EndContractBlock();
 
             this.arguments = arguments;
+
+            this.filters.Add(new DefaultValueFilter());
+            this.filters.Add(new RequiredFilter());
         }
 
         /// <summary>
@@ -53,20 +72,29 @@ namespace BurnSystems.CommandLine
         /// </summary>
         /// <param name="arguments">List of program arguments</param>
         /// <param name="definitions">List of definitions, that will define the argument structure to be parsed</param>
-        public CommandLineEvaluator(string[] arguments, IEnumerable<ICommandLineDefinition> definitions)
+        public CommandLineEvaluator(string[] arguments, IEnumerable<ICommandLineFilter> definitions)
             : this(arguments)
         {
-            this.definitions.AddRange(definitions);
+            this.filters.AddRange(definitions);
+        }
+
+        /// <summary>
+        /// Adds the information for one argument
+        /// </summary>
+        /// <param name="info">Information the be added</param>
+        public void Add(ArgumentInfo info)
+        {
+            this.argumentInfos.Add(info);
         }
 
         /// <summary>
         /// Adds a filter to the evaluator. The filter will be called before and 
         /// after the parsing
         /// </summary>
-        /// <param name="definition"></param>
-        public void AddDefinition(ICommandLineDefinition definition)
+        /// <param name="filter"></param>
+        public void AddFilter(ICommandLineFilter filter)
         {
-            this.definitions.Add(definition);
+            this.filters.Add(filter);
         }
 
         private void ParseIfNotParsed()
@@ -90,9 +118,9 @@ namespace BurnSystems.CommandLine
 
             this.isParsed = true;
 
-            foreach (var definition in definitions)
+            foreach (var filter in filters)
             {
-                definition.BeforeParsing(this);
+                filter.BeforeParsing(this);
             }
 
             // The actual parsing
@@ -130,9 +158,9 @@ namespace BurnSystems.CommandLine
                 }
             }
 
-            foreach (var definition in definitions)
+            foreach (var filter in filters)
             {
-                definition.AfterParsing(this);
+                filter.AfterParsing(this);
             }
         }
 

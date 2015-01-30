@@ -8,7 +8,7 @@ namespace BurnSystems.CommandLine
     /// <summary>
     /// This interface is used for all definitions being used in CommandLineEvaluator
     /// </summary>
-    public interface ICommandLineDefinition
+    public interface ICommandLineFilter
     {
         /// <summary>
         /// This method will be called before the arguments will be parsed

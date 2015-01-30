@@ -10,16 +10,18 @@ namespace BurnSystems.CommandLine
     {
         public static CommandLineEvaluator WithDefaultValue(this CommandLineEvaluator evaluator, string name, string value )
         {
-            var filter = new DefaultValueArgument(name, value);
-            evaluator.AddDefinition(filter);
+            WithArgument(evaluator,
+                name,
+                defaultValue: value);
 
             return evaluator;
         }
 
         public static CommandLineEvaluator Requires(this CommandLineEvaluator evaluator, string name)
         {
-            var filter = new RequiredArgument(name);
-            evaluator.AddDefinition(filter);
+            WithArgument(evaluator,
+                name,
+                isRequired: true);
 
             return evaluator;
         }
@@ -28,9 +30,23 @@ namespace BurnSystems.CommandLine
             this CommandLineEvaluator evaluator,
             string name,
             bool hasValue = false,
-            string helpText = "")
+            string helpText = "", 
+            string defaultValue = null,
+            char shortName = '\0', 
+            bool isRequired = false)
         {
-            throw new InvalidOperationException();
+            var argument = new ArgumentInfo();
+            argument.LongName = name;
+            argument.ShortName = shortName;
+            argument.IsRequired = isRequired;
+            argument.HasValue = hasValue;
+            argument.HelpText = helpText;
+            argument.DefaultValue = defaultValue;
+
+            evaluator.Add(argument);
+
+            return evaluator;
+            
         }
     }
 }

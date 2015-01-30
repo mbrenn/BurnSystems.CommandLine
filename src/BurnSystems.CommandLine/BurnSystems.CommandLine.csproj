@@ -37,12 +37,13 @@
     <!-- A reference to the entire .NET Framework is automatically included -->
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ArgumentInfo.cs" />
     <Compile Include="CommandLineEvaluator.cs" />
     <Compile Include="Extensions.cs" />
-    <Compile Include="ICommandLineDefinition.cs" />
-    <Compile Include="DefaultValueArgument.cs" />
+    <Compile Include="ICommandLineFilter.cs" />
+    <Compile Include="DefaultValueFilter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RequiredArgument.cs" />
+    <Compile Include="RequiredFilter.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
