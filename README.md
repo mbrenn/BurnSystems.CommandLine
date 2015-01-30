@@ -4,9 +4,18 @@ The commandline parser takes the arguments as given from the Main(string[] args)
 
 The commandline can be simply used: 
 
-    public static void Main(string[] args) {
-       var evaluator = new CommandLineEvaluator(args);
-    }
+        static void Main(string[] args)
+        {
+            var evaluator = new CommandLineEvaluator(args)
+                .WithArgument("input", hasValue: true, helpText: "Secret", isRequired: true)
+                .WithArgument("output", hasValue: true);
+
+            if (evaluator.ParseOrShowUsage())
+            {
+                Console.WriteLine(evaluator.NamedArguments["input"]);
+                Console.WriteLine("Success");
+            }
+        }
 
 The main syntax for an application without any argument-configuration is given as the following: 
 
