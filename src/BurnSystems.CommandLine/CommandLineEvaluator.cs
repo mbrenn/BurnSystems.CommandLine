@@ -6,6 +6,9 @@ namespace BurnSystems.CommandLine
     using System.Diagnostics.Contracts;
     using System.Linq;
     using BurnSystems.CommandLine;
+    using System.IO;
+    using System.Diagnostics;
+    using System.Reflection;
 
     /// <summary>
     /// Evaluates the command line
@@ -54,6 +57,30 @@ namespace BurnSystems.CommandLine
         }
 
         /// <summary>
+        /// Gets a list of unnamed arguments
+        /// </summary>
+        public List<string> UnnamedArguments
+        {
+            get
+            {
+                this.ParseIfNotParsed();
+                return this.unnamedArguments;
+            }
+        }
+
+        /// <summary>
+        /// Gets a dictionary of named arguments
+        /// </summary>
+        public Dictionary<string, string> NamedArguments
+        {
+            get
+            {
+                this.ParseIfNotParsed();
+                return this.namedArguments;
+            }
+        }
+
+        /// <summary>
         /// Initializes a new instance of the CommandLineEvaluator class.
         /// </summary>
         /// <param name="arguments">List of program arguments</param>
@@ -98,9 +125,34 @@ namespace BurnSystems.CommandLine
             this.filters.Add(filter);
         }
 
+        /// <summary>
+        /// Parses the arguments and shows the usage, if it the parsing did not complete.
+        /// True, if parsing was successful
+        /// </summary>
+        public bool ParseAndShowUsage()
+        {
+            try
+            {
+                this.Parse();
+            }
+            catch (ArgumentParseException exc)
+            {
+                this.ShowUsageAndException(exc);
+                return false;
+            }
+
+            if (this.NamedArguments.ContainsKey("help"))
+            {
+                this.ShowUsage();
+                return false;
+            }
+
+            return true;
+        }
+
         private void ParseIfNotParsed()
         {
-            if ( !this.isParsed)
+            if (!this.isParsed)
             {
                 this.Parse();
             }
@@ -178,27 +230,40 @@ namespace BurnSystems.CommandLine
             }
         }
 
-        /// <summary>
-        /// Gets a list of unnamed arguments
-        /// </summary>
-        public List<string> UnnamedArguments
+        private void ShowUsageAndException(ArgumentParseException exc)
         {
-            get
+            using (var writer = new StringWriter())
             {
-                this.ParseIfNotParsed();
-                return this.unnamedArguments;
+                this.WriteException(writer, exc);
+                this.WriteUsage(writer);
+
+                Debug.WriteLine(writer.GetStringBuilder().ToString());
             }
         }
 
-        /// <summary>
-        /// Gets a dictionary of named arguments
-        /// </summary>
-        public Dictionary<string, string> NamedArguments
+        private void ShowUsage()
         {
-            get
+            using (var writer = new StringWriter())
             {
-                this.ParseIfNotParsed();
-                return this.namedArguments;
+                this.WriteUsage(writer);
+
+                Debug.WriteLine(writer.GetStringBuilder().ToString());
+            }
+        }
+
+        public void WriteException(TextWriter writer, ArgumentParseException exc)
+        {
+            writer.WriteLine(exc.Message);
+        }
+
+        public void WriteUsage(TextWriter writer)
+        {
+            foreach (var argumentInfo in this.argumentInfos)
+            {
+                writer.WriteLine(
+                    string.Format("{0}: {1}",
+                    argumentInfo.LongName,
+                    argumentInfo.HelpText));
             }
         }
     }
