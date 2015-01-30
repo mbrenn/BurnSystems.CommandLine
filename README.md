@@ -37,6 +37,22 @@ This will make the evaluator return the following two named arguments:
 * input: input.txt
 * output: output.txt
 
+## Short options
+
+By defining the short name for an option, which consists of one character, the length of the 
+arguments can be shortened.
+
+    var evaluator = new CommandLineEvaluator(args)
+        .WithArgument("input", hasValue: true, shortName: 'i')
+        .WithArgument("output", hasValue: true, shortName: 'o');
+
+The following statement will be evaluated with the long names: 
+
+    consoleapp.exe -i input.txt -o output.txt
+
+* input: input.txt
+* output: output.txt
+
 ## Mandatory Value
 
 To configure a mandatory NamedArgument, the following extension method can be used:
