@@ -14,7 +14,7 @@ namespace BurnSystems.CommandLine.Test
         public void TestOptional()
         {
             var arguments = new string[] { "-f", "file1.txt" };
-            var evaluator = new CommandLineEvaluator(arguments)
+            var evaluator = new Parser(arguments)
                 .WithDefaultValue("g", "great");
 
             Assert.That(evaluator.NamedArguments.Count(), Is.EqualTo(2));
@@ -29,7 +29,7 @@ namespace BurnSystems.CommandLine.Test
         public void TestRequiredSuccess()
         {
             var arguments = new string[] { "-f", "file1.txt" };
-            var evaluator = new CommandLineEvaluator(arguments)
+            var evaluator = new Parser(arguments)
                 .Requires("f");
 
             Assert.That(evaluator.NamedArguments.Count(), Is.EqualTo(1));
@@ -43,7 +43,7 @@ namespace BurnSystems.CommandLine.Test
         public void TestRequiredFail()
         {
             var arguments = new string[] { "-f", "file1.txt" };
-            var evaluator = new CommandLineEvaluator(arguments)
+            var evaluator = new Parser(arguments)
                 .Requires("g");
 
             Assert.That(evaluator.ParseOrShowUsage(), Is.False);

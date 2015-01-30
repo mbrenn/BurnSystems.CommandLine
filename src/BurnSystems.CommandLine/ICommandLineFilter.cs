@@ -14,12 +14,12 @@ namespace BurnSystems.CommandLine
         /// This method will be called before the arguments will be parsed
         /// </summary>
         /// <param name="evaluator">Evaluator to be used</param>
-        void BeforeParsing(CommandLineEvaluator evaluator);
+        void BeforeParsing(Parser evaluator);
 
         /// <summary>
         /// This method will be called after the arguments will be parsed
         /// </summary>
         /// <param name="evaluator">Evaluator to be used</param>
-        void AfterParsing(CommandLineEvaluator evaluator);
+        void AfterParsing(Parser evaluator);
     }
 }

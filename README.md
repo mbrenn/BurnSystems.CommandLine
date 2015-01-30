@@ -6,13 +6,13 @@ The commandline can be simply used:
 
         static void Main(string[] args)
         {
-            var evaluator = new CommandLineEvaluator(args)
+            var parser = new Parser(args)
                 .WithArgument("input", hasValue: true, helpText: "Secret", isRequired: true)
                 .WithArgument("output", hasValue: true);
 
-            if (evaluator.ParseOrShowUsage())
+            if (parser.ParseOrShowUsage())
             {
-                Console.WriteLine(evaluator.NamedArguments["input"]);
+                Console.WriteLine(parser.NamedArguments["input"]);
                 Console.WriteLine("Success");
             }
         }
@@ -21,9 +21,9 @@ The main syntax for an application without any argument-configuration is given a
 
     consoleapp.exe file1.txt file2.txt -o -p -a --abc
 
-The unnamed arguments, which are retrievable via **evaluator.UnnamedArguments as List<string>** will contain two elements: file1.txt, file2.txt
+The unnamed arguments, which are retrievable via **parser.UnnamedArguments as List<string>** will contain two elements: file1.txt, file2.txt
 
-The name arguments, which are retrievable via **evaluator.NamedArguments as Dictionary<string, string>** will contain four elements: o="1", p="1", a="1" and abc="1".
+The name arguments, which are retrievable via **parser.NamedArguments as Dictionary<string, string>** will contain four elements: o="1", p="1", a="1" and abc="1".
 
 ## Argument definition
 
@@ -36,12 +36,12 @@ Per default, the commandline parser will return two named arguments ("input", "o
 It is necessary to give the command line parser a hint, so it connects the input argument with the "input.txt".
 
     public static void Main(string[] args) {
-       var evaluator = new CommandLineEvaluator(args)
+       var parser = new Parser(args)
         .WithArgument("input", hasValue: true)
         .WithArgument("output", hasValue: true);
     }
 
-This will make the evaluator return the following two named arguments: 
+This will make the parser return the following two named arguments: 
 
 * input: input.txt
 * output: output.txt
@@ -51,7 +51,7 @@ This will make the evaluator return the following two named arguments:
 By defining the short name for an option, which consists of one character, the length of the 
 arguments can be shortened.
 
-    var evaluator = new CommandLineEvaluator(args)
+    var parser = new Parser(args)
         .WithArgument("input", hasValue: true, shortName: 'i')
         .WithArgument("output", hasValue: true, shortName: 'o');
 
@@ -66,7 +66,7 @@ The following statement will be evaluated with the long names:
 
 To configure a mandatory NamedArgument, the following extension method can be used:
 
-    var evaluator = new CommandLineEvaluator(arguments)
+    var parser = new Parser(arguments)
         .Requires("f");
         
 If the application is executed without the given attribute, an exception will be thrown.
@@ -75,7 +75,7 @@ If the application is executed without the given attribute, an exception will be
 
 To configure a default value for an option, when it is not set via application, the following extension method can be used: 
 
-    var evaluator = new CommandLineEvaluator(arguments)
+    var parser = new Parser(arguments)
         .WithDefaultValue("g", "great");
         
 When there is no named argument, the named argument will contain the value "great". 

@@ -8,7 +8,7 @@ namespace BurnSystems.CommandLine
 {
     public static class Extensions
     {
-        public static CommandLineEvaluator WithDefaultValue(this CommandLineEvaluator evaluator, string name, string value )
+        public static Parser WithDefaultValue(this Parser evaluator, string name, string value )
         {
             WithArgument(evaluator,
                 name,
@@ -17,7 +17,7 @@ namespace BurnSystems.CommandLine
             return evaluator;
         }
 
-        public static CommandLineEvaluator Requires(this CommandLineEvaluator evaluator, string name)
+        public static Parser Requires(this Parser evaluator, string name)
         {
             WithArgument(evaluator,
                 name,
@@ -26,8 +26,8 @@ namespace BurnSystems.CommandLine
             return evaluator;
         }
 
-        public static CommandLineEvaluator WithArgument(
-            this CommandLineEvaluator evaluator,
+        public static Parser WithArgument(
+            this Parser evaluator,
             string name,
             bool hasValue = false,
             string helpText = "", 

@@ -1,20 +1,18 @@
 
 namespace BurnSystems.CommandLine
 {
+    using BurnSystems.CommandLine.Helper;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
-    using System.Linq;
-    using BurnSystems.CommandLine;
     using System.IO;
-    using System.Diagnostics;
+    using System.Linq;
     using System.Reflection;
-    using BurnSystems.CommandLine.Helper;
 
     /// <summary>
     /// Evaluates the command line
     /// </summary>
-    public class CommandLineEvaluator
+    public class Parser
     {
         /// <summary>
         /// Nichtbenannte Argument
@@ -98,7 +96,7 @@ namespace BurnSystems.CommandLine
         /// Initializes a new instance of the CommandLineEvaluator class.
         /// </summary>
         /// <param name="arguments">List of program arguments</param>
-        public CommandLineEvaluator(string[] arguments)
+        public Parser(string[] arguments)
         {
             Contract.Assert(arguments != null);
             Contract.EndContractBlock();
@@ -114,7 +112,7 @@ namespace BurnSystems.CommandLine
         /// </summary>
         /// <param name="arguments">List of program arguments</param>
         /// <param name="definitions">List of definitions, that will define the argument structure to be parsed</param>
-        public CommandLineEvaluator(string[] arguments, IEnumerable<ICommandLineFilter> definitions)
+        public Parser(string[] arguments, IEnumerable<ICommandLineFilter> definitions)
             : this(arguments)
         {
             this.filters.AddRange(definitions);
@@ -153,7 +151,9 @@ namespace BurnSystems.CommandLine
                 return false;
             }
 
-            if (this.NamedArguments.ContainsKey("help"))
+            if (this.NamedArguments.ContainsKey("help")
+                || this.NamedArguments.ContainsKey("h")
+                || this.NamedArguments.ContainsKey("?"))
             {
                 this.ShowUsage();
                 return false;
@@ -172,7 +172,7 @@ namespace BurnSystems.CommandLine
                 throw new InvalidOperationException("ParseOrShowUsage() is not called");
             }
 
-            if ( this.errors.Count > 0 )
+            if (this.errors.Count > 0)
             {
                 throw new InvalidOperationException("Errors occured during parsing");
             }
@@ -208,37 +208,20 @@ namespace BurnSystems.CommandLine
 
                 if (argument.StartsWith("--", StringComparison.Ordinal))
                 {
+                    // Default argument with long name
                     var argumentName = argument.Substring(2);
                     n = AddValueToNamedArgument(n, argumentName);
                 }
                 else if (argument[0] == '-')
                 {
+                    // Short argument
                     var argumentName = argument.Substring(1);
 
-                    foreach (var cChar in argumentName)
-                    {
-                        var info = this.argumentInfos.Where(x => x.ShortName == cChar).FirstOrDefault();
-                        if (info == null || !info.HasValue)
-                        {
-                            this.NamedArguments[argumentName] = "1";
-                        }
-                        else if (!info.HasValue)
-                        {
-                            this.NamedArguments[info.LongName] = "1";
-                        }
-                        else
-                        {
-                            if (argumentName.Length > 1)
-                            {
-                                this.AddError("Shortname " + cChar + " has a value and is used with other options");
-                            }
-
-                            n = this.AddValueToNamedArgument(n, info.LongName);
-                        }
-                    }
+                    this.ParseSingleDashOption(ref n, argumentName);
                 }
                 else
                 {
+                    // No single-dash or multi-dash line
                     this.unnamedArguments.Add(argument);
                 }
             }
@@ -247,6 +230,43 @@ namespace BurnSystems.CommandLine
             {
                 filter.AfterParsing(this);
             }
+        }
+
+        /// <summary>
+        /// Parses a single dash option and 
+        /// </summary>
+        /// <param name="n">Position of the argument, at which we are currently.
+        /// This will be updated, if arguments in future will be parsed</param>
+        /// <param name="argumentName">Name of the argument to be parsed</param>
+        private int ParseSingleDashOption(ref int n, string argumentName)
+        {
+            foreach (var cChar in argumentName)
+            {
+                // Check, if we have a mapping to a long name
+                var info = this.argumentInfos.Where(x => x.ShortName == cChar).FirstOrDefault();
+                if (info == null)
+                {
+                    // No, we don't have a mapping
+                    this.NamedArguments[argumentName] = "1";
+                }
+                else if (!info.HasValue)
+                {
+                    // We have a mapping, but we have no value, so default to "1"
+                    this.NamedArguments[info.LongName] = "1";
+                }
+                else
+                {
+                    // We have a mapping and a value, so the option shall be the only option
+                    if (argumentName.Length > 1)
+                    {
+                        this.AddError("Shortname " + cChar + " has a value and is used with other options");
+                    }
+
+                    n = this.AddValueToNamedArgument(n, info.LongName);
+                }
+            }
+
+            return n;
         }
 
         /// <summary>
@@ -299,7 +319,7 @@ namespace BurnSystems.CommandLine
             using (var writer = new StringWriter())
             {
                 this.WriteIntroduction(writer);
-                this.WriteException(writer);
+                this.WriteErrors(writer);
                 this.WriteUsage(writer);
 
                 Console.WriteLine(writer.GetStringBuilder().ToString());
@@ -352,7 +372,7 @@ namespace BurnSystems.CommandLine
             var maxLength = this.ArgumentInfos.Max(x => x.LongName.Length);
 
             writer.WriteLine();
-            writer.WriteLine("Arguments: ");
+            writer.WriteLine("Options: ");
             foreach (var argumentInfo in this.argumentInfos)
             {
                 writer.WriteLine(
@@ -363,7 +383,11 @@ namespace BurnSystems.CommandLine
             }
         }
 
-        public void WriteException(TextWriter writer)
+        /// <summary>
+        /// Writes the errors given during the parsing
+        /// </summary>
+        /// <param name="writer">Writer to be used</param>
+        public void WriteErrors(TextWriter writer)
         {
             if (this.errors.Count > 0)
             {
@@ -375,6 +399,18 @@ namespace BurnSystems.CommandLine
             {
                 writer.WriteLine("  " + error);
             }
+        }
+
+        /// <summary>
+        /// Parses the arguments out of a single line
+        /// </summary>
+        /// <param name="args">Arguments to be parsed</param>
+        /// <returns>The created parsed</returns>
+        public static Parser Parse(string[] args)
+        {
+            var parser = new Parser(args);
+            parser.Parse();
+            return parser;
         }
     }
 }

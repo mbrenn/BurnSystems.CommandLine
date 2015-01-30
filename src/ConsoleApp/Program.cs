@@ -11,7 +11,7 @@ namespace ConsoleApp
     {
         static void Main(string[] args)
         {
-            var evaluator = new CommandLineEvaluator(args)
+            var evaluator = new Parser(args)
                 .WithArgument("input", hasValue: true, helpText: "Secret", isRequired: true)
                 .WithArgument("output", hasValue: true);
 

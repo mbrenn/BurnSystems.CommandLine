@@ -15,7 +15,7 @@ namespace BurnSystems.CommandLine.Test
         public void TestNamedArgumentsWithValue()
         {
             var args = new string[] { "--input", "input.txt", "--output", "output.txt" };
-            var evaluator = new CommandLineEvaluator(args)
+            var evaluator = new Parser(args)
                  .WithArgument("input", hasValue: true)
                  .WithArgument("output", hasValue: true);
 
@@ -30,7 +30,7 @@ namespace BurnSystems.CommandLine.Test
         public void TestShortName()
         {
             var args = new string[] { "-i", "input.txt", "-o", "output.txt" };
-            var evaluator = new CommandLineEvaluator(args)
+            var evaluator = new Parser(args)
                 .WithArgument("input", hasValue: true, shortName: 'i')
                 .WithArgument("output", hasValue: true, shortName: 'o');
 
@@ -45,7 +45,7 @@ namespace BurnSystems.CommandLine.Test
         public void TestIncompleteNamedAndUnnamedArguments()
         {
             var args = new string[] { "--input", "input.txt", "--output" };
-            var evaluator = new CommandLineEvaluator(args)
+            var evaluator = new Parser(args)
                  .WithArgument("input", hasValue: true)
                  .WithArgument("output", hasValue: true);
             Assert.That(evaluator.ParseOrShowUsage(), Is.False);
@@ -55,7 +55,7 @@ namespace BurnSystems.CommandLine.Test
         public void TestUsage()
         {
             var args = new string[] { "--input", "input.txt", "--output" };
-            var evaluator = new CommandLineEvaluator(args)
+            var evaluator = new Parser(args)
                 .WithArgument("input", hasValue: true, helpText: "Secret")
                 .WithArgument("output", hasValue: true);
 

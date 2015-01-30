@@ -14,7 +14,7 @@ namespace BurnSystems.CommandLine.Test
         public void TestEmpty()
         {
             var args = new string[] { };
-            var evaluator = new CommandLineEvaluator(args);
+            var evaluator = new Parser(args);
             Assert.That(evaluator.NamedArguments.Count, Is.EqualTo(0));
             Assert.That(evaluator.UnnamedArguments.Count, Is.EqualTo(0));
         }
@@ -23,7 +23,7 @@ namespace BurnSystems.CommandLine.Test
         public void TestUnnamedArguments()
         {
             var args = new string[] { "file1.txt", "file2.txt" };
-            var evaluator = new CommandLineEvaluator(args);
+            var evaluator = new Parser(args);
             Assert.That(evaluator.NamedArguments.Count, Is.EqualTo(0));
             Assert.That(evaluator.UnnamedArguments.Count, Is.EqualTo(2));
             Assert.That(evaluator.UnnamedArguments[0], Is.EqualTo("file1.txt"));
@@ -34,7 +34,7 @@ namespace BurnSystems.CommandLine.Test
         public void TestNamedArguments()
         {
             var args = new string[] { "-f", "-o" };
-            var evaluator = new CommandLineEvaluator(args);
+            var evaluator = new Parser(args);
             Assert.That(evaluator.NamedArguments.Count, Is.EqualTo(2));
             Assert.That(evaluator.UnnamedArguments.Count, Is.EqualTo(0));
             Assert.That(evaluator.NamedArguments.ContainsKey("f"), Is.True);
@@ -47,7 +47,7 @@ namespace BurnSystems.CommandLine.Test
         public void TestNamedAndUnnamedArguments()
         {
             var args = new string[] { "-f", "file1.txt", "-o", "file2.txt" };
-            var evaluator = new CommandLineEvaluator(args);
+            var evaluator = new Parser(args);
             Assert.That(evaluator.NamedArguments.Count, Is.EqualTo(2));
             Assert.That(evaluator.NamedArguments.ContainsKey("f"), Is.True);
             Assert.That(evaluator.NamedArguments.ContainsKey("o"), Is.True);

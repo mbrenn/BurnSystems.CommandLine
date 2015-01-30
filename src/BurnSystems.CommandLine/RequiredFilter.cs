@@ -19,11 +19,11 @@ namespace BurnSystems.CommandLine
         {
         }
 
-        void ICommandLineFilter.BeforeParsing(CommandLineEvaluator evaluator)
+        void ICommandLineFilter.BeforeParsing(Parser evaluator)
         {
         }
 
-        void ICommandLineFilter.AfterParsing(CommandLineEvaluator evaluator)
+        void ICommandLineFilter.AfterParsing(Parser evaluator)
         {
             foreach (var argument in evaluator.ArgumentInfos)
             {

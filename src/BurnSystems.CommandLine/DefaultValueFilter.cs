@@ -19,7 +19,7 @@ namespace BurnSystems.CommandLine
         {
         }
 
-        void ICommandLineFilter.BeforeParsing(CommandLineEvaluator evaluator)
+        void ICommandLineFilter.BeforeParsing(Parser evaluator)
         {
             foreach (var argument in evaluator.ArgumentInfos)
             {
@@ -30,7 +30,7 @@ namespace BurnSystems.CommandLine
             }
         }
 
-        void ICommandLineFilter.AfterParsing(CommandLineEvaluator evaluator)
+        void ICommandLineFilter.AfterParsing(Parser evaluator)
         {
         }
     }
