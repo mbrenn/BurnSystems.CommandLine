@@ -9,6 +9,7 @@ namespace BurnSystems.CommandLine
     using System.IO;
     using System.Diagnostics;
     using System.Reflection;
+    using BurnSystems.CommandLine.Helper;
 
     /// <summary>
     /// Evaluates the command line
@@ -49,6 +50,11 @@ namespace BurnSystems.CommandLine
         private string[] arguments;
 
         /// <summary>
+        /// Stores the errors which were created during parsing
+        /// </summary>
+        private List<string> errors = new List<string>();
+
+        /// <summary>
         /// Returns the argument information
         /// </summary>
         public IEnumerable<ArgumentInfo> ArgumentInfos
@@ -63,7 +69,11 @@ namespace BurnSystems.CommandLine
         {
             get
             {
-                this.ParseIfNotParsed();
+                if (!this.isParsed)
+                {
+                    this.Parse();
+                }
+
                 return this.unnamedArguments;
             }
         }
@@ -75,7 +85,11 @@ namespace BurnSystems.CommandLine
         {
             get
             {
-                this.ParseIfNotParsed();
+                if (!this.isParsed)
+                {
+                    this.Parse();
+                }
+
                 return this.namedArguments;
             }
         }
@@ -109,7 +123,7 @@ namespace BurnSystems.CommandLine
         /// <summary>
         /// Adds the information for one argument
         /// </summary>
-        /// <param name="info">Information the be added</param>
+        /// <param name="info">Information to be added</param>
         public void Add(ArgumentInfo info)
         {
             this.argumentInfos.Add(info);
@@ -131,13 +145,11 @@ namespace BurnSystems.CommandLine
         /// </summary>
         public bool ParseOrShowUsage()
         {
-            try
+            this.Parse();
+
+            if (this.errors.Count > 0)
             {
-                this.Parse();
-            }
-            catch (ArgumentParseException exc)
-            {
-                this.ShowUsageAndException(exc);
+                this.ShowUsageAndException();
                 return false;
             }
 
@@ -150,11 +162,19 @@ namespace BurnSystems.CommandLine
             return true;
         }
 
-        private void ParseIfNotParsed()
+        /// <summary>
+        /// Checks, if we have an error during parsing
+        /// </summary>
+        private void CheckForErrors()
         {
             if (!this.isParsed)
             {
-                this.Parse();
+                throw new InvalidOperationException("ParseOrShowUsage() is not called");
+            }
+
+            if ( this.errors.Count > 0 )
+            {
+                throw new InvalidOperationException("Errors occured during parsing");
             }
         }
 
@@ -211,11 +231,13 @@ namespace BurnSystems.CommandLine
                         n++;
                         if (arguments.Length <= n)
                         {
-                            throw new ArgumentParseException(
+                            this.AddError(
                                 "Value missing for parameter: " + argumentName);
                         }
-
-                        this.namedArguments[argumentName] = arguments[n];
+                        else
+                        {
+                            this.namedArguments[argumentName] = arguments[n];
+                        }
                     }
                 }
                 else
@@ -231,14 +253,24 @@ namespace BurnSystems.CommandLine
         }
 
         /// <summary>
+        /// Adds an error to the parsing
+        /// </summary>
+        /// <param name="error">Error to be added</param>
+        public void AddError(string error)
+        {
+            this.errors.Add(error);
+        }
+
+        /// <summary>
         /// Shows the exception and the usage argument
         /// </summary>
         /// <param name="exc">Exception being used</param>
-        private void ShowUsageAndException(ArgumentParseException exc)
+        private void ShowUsageAndException()
         {
             using (var writer = new StringWriter())
             {
-                this.WriteException(writer, exc);
+                this.WriteIntroduction(writer);
+                this.WriteException(writer);
                 this.WriteUsage(writer);
 
                 Console.WriteLine(writer.GetStringBuilder().ToString());
@@ -252,25 +284,67 @@ namespace BurnSystems.CommandLine
         {
             using (var writer = new StringWriter())
             {
+                this.WriteIntroduction(writer);
                 this.WriteUsage(writer);
 
                 Console.WriteLine(writer.GetStringBuilder().ToString());
             }
         }
 
-        public void WriteException(TextWriter writer, ArgumentParseException exc)
+        public void WriteIntroduction(TextWriter writer)
         {
-            writer.WriteLine(exc.Message);
+            var options = string.Empty;
+
+            if (this.argumentInfos.Count > 0)
+            {
+                options = " {options}";
+            }
+
+            var assembly = Assembly.GetEntryAssembly();
+
+            if (assembly != null)
+            {
+                writer.WriteLine(
+                    string.Format("{0}{1}",
+                        Path.GetFileName(Assembly.GetEntryAssembly().Location),
+                        options));
+            }
         }
 
         public void WriteUsage(TextWriter writer)
-        {
+        {   
+            // No arguments, no information
+            if (this.ArgumentInfos.Count() == 0)
+            {
+                return;
+            }
+
+            // Gets the maximum length of the arguments
+            var maxLength = this.ArgumentInfos.Max(x => x.LongName.Length);
+
+            writer.WriteLine();
+            writer.WriteLine("Arguments: ");
             foreach (var argumentInfo in this.argumentInfos)
             {
                 writer.WriteLine(
-                    string.Format("{0}: {1}",
-                    argumentInfo.LongName,
-                    argumentInfo.HelpText));
+                    string.Format(
+                        "    --{0}{1}",
+                        StringManipulation.PaddingRight(argumentInfo.LongName, maxLength + 4),
+                        argumentInfo.HelpText));
+            }
+        }
+
+        public void WriteException(TextWriter writer)
+        {
+            if (this.errors.Count > 0)
+            {
+                writer.WriteLine();
+                writer.WriteLine("An error occured during parsing:");
+            }
+
+            foreach (var error in this.errors)
+            {
+                writer.WriteLine("  " + error);
             }
         }
     }

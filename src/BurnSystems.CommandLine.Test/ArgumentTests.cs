@@ -33,7 +33,7 @@ namespace BurnSystems.CommandLine.Test
             var evaluator = new CommandLineEvaluator(args)
                  .WithArgument("input", hasValue: true)
                  .WithArgument("output", hasValue: true);
-            Assert.Throws<ArgumentParseException>(() => evaluator.NamedArguments.Count());
+            Assert.That(evaluator.ParseOrShowUsage(), Is.False);
         }
 
         [Test]

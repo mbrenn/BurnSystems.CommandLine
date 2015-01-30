@@ -15,7 +15,7 @@ namespace ConsoleApp
                 .WithArgument("input", hasValue: true, helpText: "Secret", isRequired: true)
                 .WithArgument("output", hasValue: true);
 
-            if ( evaluator.ParseOrShowUsage())
+            if (evaluator.ParseOrShowUsage())
             {
                 Console.WriteLine("Success");
             }

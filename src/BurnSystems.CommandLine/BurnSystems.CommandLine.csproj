@@ -35,6 +35,7 @@
     <Compile Include="ArgumentInfo.cs" />
     <Compile Include="CommandLineEvaluator.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="Helper\StringManipulation.cs" />
     <Compile Include="ICommandLineFilter.cs" />
     <Compile Include="DefaultValueFilter.cs" />
     <Compile Include="ArgumentParseException.cs" />
