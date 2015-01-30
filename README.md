@@ -27,7 +27,7 @@ The name arguments, which are retrievable via **evaluator.NamedArguments as Dict
 
 ## Argument definition
 
-### Named Argument with values (Not implemented until now)
+### Named Argument with values
 
     consoleapp.exe --input input.txt --output output.txt
     
