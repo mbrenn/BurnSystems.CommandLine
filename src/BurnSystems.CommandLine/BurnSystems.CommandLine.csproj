@@ -42,6 +42,7 @@
     <Compile Include="Extensions.cs" />
     <Compile Include="ICommandLineFilter.cs" />
     <Compile Include="DefaultValueFilter.cs" />
+    <Compile Include="ArgumentParseException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RequiredFilter.cs" />
   </ItemGroup>

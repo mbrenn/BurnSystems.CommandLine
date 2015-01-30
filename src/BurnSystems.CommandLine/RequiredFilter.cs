@@ -30,7 +30,7 @@ namespace BurnSystems.CommandLine
                 if (argument.IsRequired
                     && !evaluator.NamedArguments.ContainsKey ( argument.LongName ))
                 {
-                    throw new InvalidOperationException(
+                    throw new ArgumentParseException(
                         "Required Argument '" + argument.LongName + "' is not given");
                 }
             }

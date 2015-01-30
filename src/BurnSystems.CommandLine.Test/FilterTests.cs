@@ -46,7 +46,7 @@ namespace BurnSystems.CommandLine.Test
             var evaluator = new CommandLineEvaluator(arguments)
                 .Requires("g");
 
-            Assert.Throws<InvalidOperationException>(() => evaluator.NamedArguments.Count());
+            Assert.Throws<ArgumentParseException>(() => evaluator.NamedArguments.Count());
         }
     }
 }

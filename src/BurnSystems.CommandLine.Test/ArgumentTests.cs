@@ -24,5 +24,15 @@ namespace BurnSystems.CommandLine.Test
             Assert.That(evaluator.NamedArguments["input"], Is.EqualTo("input.txt"));
             Assert.That(evaluator.NamedArguments["output"], Is.EqualTo("output.txt"));
         }
+
+        [Test]
+        public void TestIncompleteNamedAndUnnamedArguments()
+        {
+            var args = new string[] { "--input", "input.txt", "--output" };
+            var evaluator = new CommandLineEvaluator(args)
+                 .WithArgument("input", hasValue: true)
+                 .WithArgument("output", hasValue: true);
+            Assert.Throws<ArgumentParseException>(() => evaluator.NamedArguments.Count());
+        }
     }
 }

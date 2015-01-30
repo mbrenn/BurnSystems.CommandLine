@@ -3,8 +3,9 @@ namespace BurnSystems.CommandLine
 {
     using System;
     using System.Collections.Generic;
-    using BurnSystems.CommandLine;
     using System.Diagnostics.Contracts;
+    using System.Linq;
+    using BurnSystems.CommandLine;
 
     /// <summary>
     /// Evaluates the command line
@@ -124,33 +125,46 @@ namespace BurnSystems.CommandLine
             }
 
             // The actual parsing
-            foreach (var argument in arguments)
+            for(var n = 0; n < arguments.Length; n++)
             {
+                var argument = arguments[n];
                 if (string.IsNullOrEmpty(argument))
                 {
                     // Do nothing, when the argument is empty
                     continue;
                 }
-                else if (argument.StartsWith("--", StringComparison.Ordinal))
-                {
-                    this.namedArguments[argument.Substring(2)] = "1";
 
-                    continue;
+                string argumentName = null;
+                if (argument.StartsWith("--", StringComparison.Ordinal))
+                {
+                    argumentName = argument.Substring(2);
                 }
                 else if (argument[0] == '-')
                 {
-                    int pos = argument.IndexOf('=');
-                    if (pos == -1)
+                    argumentName = argument.Substring(1);
+                }
+
+                if (argumentName != null)
+                {
+                    // Supports the named arguments with values
+                    var info = 
+                        this.argumentInfos.Where(x => x.LongName == argumentName).FirstOrDefault();
+
+                    if (info == null || !info.HasValue)
                     {
-                        this.namedArguments[argument.Substring(1)] = "1";
+                        this.namedArguments[argumentName] = "1";
                     }
                     else
                     {
-                        this.namedArguments[argument.Substring(1, pos - 1)] =
-                            argument.Substring(pos + 1);
-                    }
+                        n++;
+                        if (arguments.Length <= n)
+                        {
+                            throw new ArgumentParseException(
+                                "Value missing for parameter: " + argumentName);
+                        }
 
-                    continue;
+                        this.namedArguments[argumentName] = arguments[n];
+                    }
                 }
                 else
                 {
