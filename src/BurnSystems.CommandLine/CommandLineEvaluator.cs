@@ -129,7 +129,7 @@ namespace BurnSystems.CommandLine
         /// Parses the arguments and shows the usage, if it the parsing did not complete.
         /// True, if parsing was successful
         /// </summary>
-        public bool ParseAndShowUsage()
+        public bool ParseOrShowUsage()
         {
             try
             {
@@ -230,6 +230,10 @@ namespace BurnSystems.CommandLine
             }
         }
 
+        /// <summary>
+        /// Shows the exception and the usage argument
+        /// </summary>
+        /// <param name="exc">Exception being used</param>
         private void ShowUsageAndException(ArgumentParseException exc)
         {
             using (var writer = new StringWriter())
@@ -237,17 +241,20 @@ namespace BurnSystems.CommandLine
                 this.WriteException(writer, exc);
                 this.WriteUsage(writer);
 
-                Debug.WriteLine(writer.GetStringBuilder().ToString());
+                Console.WriteLine(writer.GetStringBuilder().ToString());
             }
         }
 
+        /// <summary>
+        /// Shows the usage
+        /// </summary>
         private void ShowUsage()
         {
             using (var writer = new StringWriter())
             {
                 this.WriteUsage(writer);
 
-                Debug.WriteLine(writer.GetStringBuilder().ToString());
+                Console.WriteLine(writer.GetStringBuilder().ToString());
             }
         }
 
