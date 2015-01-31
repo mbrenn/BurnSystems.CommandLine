@@ -27,11 +27,32 @@ namespace BurnSystems.CommandLine
         {
             foreach (var argument in evaluator.ArgumentInfos)
             {
-                if (argument.IsRequired
-                    && !evaluator.NamedArguments.ContainsKey ( argument.LongName ))
+                if (!argument.IsRequired)
                 {
-                    evaluator.AddError(
-                        "Required Argument '" + argument.LongName + "' is not given");
+                    continue;
+                }
+
+                var namedArgument = argument as NamedArgumentInfo;
+                var unnamedArgument = argument as UnnamedArgumentInfo;
+
+                if (namedArgument != null)
+                {
+                    if (!evaluator.NamedArguments.ContainsKey(namedArgument.LongName))
+                    {
+                        evaluator.AddError(
+                            "Required Argument '" + namedArgument.LongName + "' is not given");
+                    }
+                }
+
+                if (unnamedArgument != null)
+                {
+                    if (unnamedArgument.Index >= evaluator.UnnamedArguments.Count)
+                    {
+                        evaluator.AddError(
+                            string.Format(
+                                "Not enough arguments were given. {0} arguments were expected",
+                                unnamedArgument.Index));
+                    }
                 }
             }
         }

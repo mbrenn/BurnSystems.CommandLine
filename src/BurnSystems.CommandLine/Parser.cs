@@ -61,6 +61,29 @@ namespace BurnSystems.CommandLine
         }
 
         /// <summary>
+        /// Gets all argument infos, which describe the named arguments
+        /// </summary>
+        public IEnumerable<NamedArgumentInfo> NamedArgumentInfos
+        {
+            get { return this.ArgumentInfos
+                .Select(x => x as NamedArgumentInfo)
+                .Where(x => x != null); }
+        }
+
+        /// <summary>
+        /// Gets all argument infos, which describe the unnamed arguments
+        /// </summary>
+        public IEnumerable<UnnamedArgumentInfo> UnnamedArgumentInfos
+        {
+            get
+            {
+                return this.ArgumentInfos
+                    .Select(x => x as UnnamedArgumentInfo)
+                    .Where(x => x != null);
+            }
+        }
+
+        /// <summary>
         /// Gets a list of unnamed arguments
         /// </summary>
         public List<string> UnnamedArguments
@@ -243,7 +266,7 @@ namespace BurnSystems.CommandLine
             foreach (var cChar in argumentName)
             {
                 // Check, if we have a mapping to a long name
-                var info = this.argumentInfos.Where(x => x.ShortName == cChar).FirstOrDefault();
+                var info = this.NamedArgumentInfos.Where(x => x.ShortName == cChar).FirstOrDefault();
                 if (info == null)
                 {
                     // No, we don't have a mapping
@@ -279,7 +302,7 @@ namespace BurnSystems.CommandLine
         {
             // Supports the named arguments with values
             var info =
-                this.argumentInfos.Where(x => x.LongName == argumentName).FirstOrDefault();
+                this.NamedArgumentInfos.Where(x => x.LongName == argumentName).FirstOrDefault();
 
             if (info == null || !info.HasValue)
             {
@@ -298,6 +321,7 @@ namespace BurnSystems.CommandLine
                     this.namedArguments[argumentName] = arguments[n];
                 }
             }
+
             return n;
         }
 
@@ -369,11 +393,12 @@ namespace BurnSystems.CommandLine
             }
 
             // Gets the maximum length of the arguments
-            var maxLength = this.ArgumentInfos.Max(x => x.LongName.Length);
+            var namedArgumentInfos = this.NamedArgumentInfos;
+            var maxLength = namedArgumentInfos.Max(x => x.LongName.Length);
 
             writer.WriteLine();
             writer.WriteLine("Options: ");
-            foreach (var argumentInfo in this.argumentInfos)
+            foreach (var argumentInfo in namedArgumentInfos)
             {
                 writer.WriteLine(
                     string.Format(
@@ -399,18 +424,6 @@ namespace BurnSystems.CommandLine
             {
                 writer.WriteLine("  " + error);
             }
-        }
-
-        /// <summary>
-        /// Parses the arguments out of a single line
-        /// </summary>
-        /// <param name="args">Arguments to be parsed</param>
-        /// <returns>The created parsed</returns>
-        public static Parser Parse(string[] args)
-        {
-            var parser = new Parser(args);
-            parser.Parse();
-            return parser;
         }
     }
 }

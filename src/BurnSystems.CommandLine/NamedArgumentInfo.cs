@@ -10,28 +10,15 @@ namespace BurnSystems.CommandLine
     /// Stores the information to a specific argument, 
     /// that will be automatically parsed
     /// </summary>
-    public abstract class ArgumentInfo
+    public class NamedArgumentInfo : ArgumentInfo
     {
-
-        public bool HasValue
+        public char ShortName
         {
             get;
             set;
         }
 
-        public string HelpText
-        {
-            get;
-            set;
-        }
-
-        public string DefaultValue
-        {
-            get;
-            set;
-        }
-
-        public bool IsRequired
+        public string LongName
         {
             get;
             set;

@@ -35,7 +35,7 @@ namespace BurnSystems.CommandLine
             char shortName = '\0', 
             bool isRequired = false)
         {
-            var argument = new ArgumentInfo();
+            var argument = new NamedArgumentInfo();
             argument.LongName = name;
             argument.ShortName = shortName;
             argument.IsRequired = isRequired;

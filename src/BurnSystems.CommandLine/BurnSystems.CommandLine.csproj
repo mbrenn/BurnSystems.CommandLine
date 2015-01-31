@@ -32,6 +32,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="NamedArgumentInfo.cs" />
+    <Compile Include="UnnamedArgumentInfo.cs" />
     <Compile Include="ArgumentInfo.cs" />
     <Compile Include="Parser.cs" />
     <Compile Include="Extensions.cs" />
