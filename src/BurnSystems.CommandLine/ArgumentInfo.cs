@@ -10,9 +10,8 @@ namespace BurnSystems.CommandLine
     /// Stores the information to a specific argument, 
     /// that will be automatically parsed
     /// </summary>
-    public abstract class ArgumentInfo
+    internal abstract class ArgumentInfo
     {
-
         public bool HasValue
         {
             get;

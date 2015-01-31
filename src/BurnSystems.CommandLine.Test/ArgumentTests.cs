@@ -52,7 +52,7 @@ namespace BurnSystems.CommandLine.Test
         }
 
         [Test]
-        public void TestUsage()
+        public void TestUsageWithNamedArgument()
         {
             var args = new string[] { "--input", "input.txt", "--output" };
             var evaluator = new Parser(args)
@@ -67,6 +67,38 @@ namespace BurnSystems.CommandLine.Test
                 Assert.That(usageText.Contains("input"), Is.True);
                 Assert.That(usageText.Contains("output"), Is.True);
                 Assert.That(usageText.Contains("Secret"), Is.True);
+            }
+        }
+
+        [Test]
+        public void TestUsageWithUnamedArgument()
+        {
+            var args = new string[] { "--input", "input.txt", "--output" };
+            var evaluator = new Parser(args)
+                .WithArgument(1, hasValue: true, helpText: "Secret")
+                .WithArgument(2, hasValue: true);
+
+            using (var writer = new StringWriter())
+            {
+                evaluator.WriteUsage(writer);
+
+                var usageText = writer.GetStringBuilder().ToString();
+                Assert.That(usageText.Contains("Secret"), Is.True);
+            }
+        }
+
+        [Test]
+        public void TestUsageWithNoArgument()
+        {
+            var args = new string[] { "--input", "input.txt", "--output" };
+            var evaluator = new Parser(args);
+
+            using (var writer = new StringWriter())
+            {
+                evaluator.WriteUsage(writer);
+
+                var usageText = writer.GetStringBuilder().ToString();
+                Assert.That(usageText.Length, Is.GreaterThan(0));
             }
         }
     }

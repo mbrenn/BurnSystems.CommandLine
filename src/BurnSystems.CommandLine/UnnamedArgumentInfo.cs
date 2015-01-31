@@ -10,7 +10,7 @@ namespace BurnSystems.CommandLine
     /// Stores the information to a specific argument, 
     /// that will be automatically parsed
     /// </summary>
-    public class UnnamedArgumentInfo : ArgumentInfo
+    internal class UnnamedArgumentInfo : ArgumentInfo
     {
         /// <summary>
         /// Gets or sets the index where the parameter is located. 

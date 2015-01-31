@@ -55,7 +55,7 @@ namespace BurnSystems.CommandLine
         /// <summary>
         /// Returns the argument information
         /// </summary>
-        public IEnumerable<ArgumentInfo> ArgumentInfos
+        internal IEnumerable<ArgumentInfo> ArgumentInfos
         {
             get { return this.argumentInfos; }
         }
@@ -63,7 +63,7 @@ namespace BurnSystems.CommandLine
         /// <summary>
         /// Gets all argument infos, which describe the named arguments
         /// </summary>
-        public IEnumerable<NamedArgumentInfo> NamedArgumentInfos
+        internal IEnumerable<NamedArgumentInfo> NamedArgumentInfos
         {
             get { return this.ArgumentInfos
                 .Select(x => x as NamedArgumentInfo)
@@ -73,7 +73,7 @@ namespace BurnSystems.CommandLine
         /// <summary>
         /// Gets all argument infos, which describe the unnamed arguments
         /// </summary>
-        public IEnumerable<UnnamedArgumentInfo> UnnamedArgumentInfos
+        internal IEnumerable<UnnamedArgumentInfo> UnnamedArgumentInfos
         {
             get
             {
@@ -145,7 +145,7 @@ namespace BurnSystems.CommandLine
         /// Adds the information for one argument
         /// </summary>
         /// <param name="info">Information to be added</param>
-        public void AddArgumentInfo(ArgumentInfo info)
+        internal void AddArgumentInfo(ArgumentInfo info)
         {
             this.argumentInfos.Add(info);
         }
@@ -385,26 +385,53 @@ namespace BurnSystems.CommandLine
         }
 
         public void WriteUsage(TextWriter writer)
-        {   
-            // No arguments, no information
-            if (this.ArgumentInfos.Count() == 0)
-            {
-                return;
-            }
-
-            // Gets the maximum length of the arguments
-            var namedArgumentInfos = this.NamedArgumentInfos;
-            var maxLength = namedArgumentInfos.Max(x => x.LongName.Length);
-
+        {
             writer.WriteLine();
             writer.WriteLine("Options: ");
-            foreach (var argumentInfo in namedArgumentInfos)
+
+            // Finds the maximum length of the argument
+            var unnamedArgumentInfos = this.UnnamedArgumentInfos.ToList();
+            var namedArgumentInfos = this.NamedArgumentInfos.ToList();
+            int maxLength = 0;
+            if (unnamedArgumentInfos.Count > 0)
             {
+                maxLength = "Argument x".Length;
+            }
+
+            if (namedArgumentInfos.Count() > 0)
+            {
+                maxLength =
+                    Math.Max(
+                        maxLength,
+                        namedArgumentInfos.Max(x => x.LongName.Length));
+            }
+
+            // Gets the unnamed arguments
+            var n = 0;
+            foreach (var argumentInfo in this.UnnamedArgumentInfos)
+            {
+                n++;
+                var argumentName =
+                    string.Format("Argument {0}", n);
                 writer.WriteLine(
                     string.Format(
                         "    --{0}{1}",
-                        StringManipulation.PaddingRight(argumentInfo.LongName, maxLength + 4),
+                        StringManipulation.PaddingRight(argumentName, maxLength + 4),
                         argumentInfo.HelpText));
+            }
+
+            // No arguments, no information
+            if (namedArgumentInfos.Count() > 0)
+            {
+                // Gets the maximum length of the arguments
+                foreach (var argumentInfo in namedArgumentInfos)
+                {
+                    writer.WriteLine(
+                        string.Format(
+                            "    --{0}{1}",
+                            StringManipulation.PaddingRight(argumentInfo.LongName, maxLength + 4),
+                            argumentInfo.HelpText));
+                }
             }
         }
 

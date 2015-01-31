@@ -17,10 +17,28 @@ namespace BurnSystems.CommandLine
             return evaluator;
         }
 
+        public static Parser WithDefaultValue(this Parser evaluator, int index, string value)
+        {
+            WithArgument(evaluator,
+                index,
+                defaultValue: value);
+
+            return evaluator;
+        }
+
         public static Parser Requires(this Parser evaluator, string name)
         {
             WithArgument(evaluator,
                 name,
+                isRequired: true);
+
+            return evaluator;
+        }
+
+        public static Parser Requires(this Parser evaluator, int index)
+        {
+            WithArgument(evaluator,
+                index,
                 isRequired: true);
 
             return evaluator;
@@ -46,7 +64,26 @@ namespace BurnSystems.CommandLine
             evaluator.AddArgumentInfo(argument);
 
             return evaluator;
-            
+        }
+
+        public static Parser WithArgument(
+            this Parser evaluator,
+            int index,
+            bool hasValue = false,
+            string helpText = "",
+            string defaultValue = null,
+            bool isRequired = false)
+        {
+            var argument = new UnnamedArgumentInfo();
+            argument.Index = index;
+            argument.IsRequired = isRequired;
+            argument.HasValue = hasValue;
+            argument.HelpText = helpText;
+            argument.DefaultValue = defaultValue;
+
+            evaluator.AddArgumentInfo(argument);
+
+            return evaluator;
         }
     }
 }

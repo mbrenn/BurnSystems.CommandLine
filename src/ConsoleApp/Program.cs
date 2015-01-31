@@ -13,7 +13,9 @@ namespace ConsoleApp
         {
             var evaluator = new Parser(args)
                 .WithArgument("input", hasValue: true, helpText: "Secret", isRequired: true)
-                .WithArgument("output", hasValue: true);
+                .WithArgument("output", hasValue: true)
+                .WithArgument(0, helpText: "Input file", isRequired: true)
+                .WithArgument(1, helpText: "Output file");
 
             if (evaluator.ParseOrShowUsage())
             {

@@ -40,11 +40,45 @@ namespace BurnSystems.CommandLine.Test
         }
 
         [Test]
-        public void TestRequiredFail()
+        public void TestRequiredFailNamedArgument()
         {
             var arguments = new string[] { "-f", "file1.txt" };
             var evaluator = new Parser(arguments)
                 .Requires("g");
+
+            Assert.That(evaluator.ParseOrShowUsage(), Is.False);
+        }
+
+        [Test]
+        public void TestRequiredRequire1ExistingUnnamedArgument()
+        {
+            var arguments = new string[] { "-f", "file1.txt" };
+            var evaluator = new Parser(arguments)
+                .Requires(1);
+
+            Assert.That(evaluator.NamedArguments.Count(), Is.EqualTo(1));
+            Assert.That(evaluator.NamedArguments.ContainsKey("f"), Is.True);
+            Assert.That(evaluator.UnnamedArguments.Count, Is.EqualTo(1));
+            Assert.That(evaluator.UnnamedArguments[0], Is.EqualTo("file1.txt"));
+        }
+
+        [Test]
+        public void TestRequiredRequire1NonExistingUnnamedArgument()
+        {
+            var arguments = new string[] { "-f", "file1.txt" };
+            var evaluator = new Parser(arguments)
+                .Requires(2);
+
+            Assert.That(evaluator.ParseOrShowUsage(), Is.False);
+        }
+
+        [Test]
+        public void TestRequiredFailNamedArgumentWithValue()
+        {
+            var arguments = new string[] { "-f", "file1.txt" };
+            var evaluator = new Parser(arguments)
+                .WithArgument("f", hasValue: true)
+                .Requires(1);
 
             Assert.That(evaluator.ParseOrShowUsage(), Is.False);
         }

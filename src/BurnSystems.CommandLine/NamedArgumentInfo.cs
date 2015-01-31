@@ -10,7 +10,7 @@ namespace BurnSystems.CommandLine
     /// Stores the information to a specific argument, 
     /// that will be automatically parsed
     /// </summary>
-    public class NamedArgumentInfo : ArgumentInfo
+    internal class NamedArgumentInfo : ArgumentInfo
     {
         public char ShortName
         {

@@ -48,10 +48,19 @@ namespace BurnSystems.CommandLine
                 {
                     if (unnamedArgument.Index >= evaluator.UnnamedArguments.Count)
                     {
-                        evaluator.AddError(
-                            string.Format(
-                                "Not enough arguments were given. {0} arguments were expected",
-                                unnamedArgument.Index));
+                        if (unnamedArgument.Index == 0)
+                        {
+                            evaluator.AddError(
+                                string.Format(
+                                    "Not enough arguments were given. 1 argument was expected"));
+                        }
+                        else
+                        {
+                            evaluator.AddError(
+                                string.Format(
+                                    "Not enough arguments were given. {0} arguments were expected",
+                                    unnamedArgument.Index + 1));
+                        }
                     }
                 }
             }
