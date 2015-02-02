@@ -25,5 +25,11 @@ namespace ConsoleApp
             get;
             set;
         }
+
+        public int Duration
+        {
+            get;
+            set;
+        }
     }
 }

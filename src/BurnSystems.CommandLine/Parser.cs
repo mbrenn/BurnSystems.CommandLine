@@ -128,12 +128,20 @@ namespace BurnSystems.CommandLine
         {
             var byAttributeParser = new ByAttributeParser<T>();
             var parser = byAttributeParser.PrepareParser(args);
-            if (!parser.ParseOrShowUsage())
+            parser.Parse();
+
+            if (parser.ShowUsageIfNecessary())
             {
                 return null;
             }
 
-            return byAttributeParser.ParseIntoObject();
+            var result = byAttributeParser.FillObject();
+            if (parser.ShowUsageIfNecessary())
+            {
+                return null;
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -188,14 +196,25 @@ namespace BurnSystems.CommandLine
         /// Parses the arguments and shows the usage, if it the parsing did not complete.
         /// True, if parsing was successful
         /// </summary>
+        /// <returns>True, when parsing was successful</returns>
         public bool ParseOrShowUsage()
         {
             this.Parse();
 
+            return !this.ShowUsageIfNecessary();
+        }
+
+        /// <summary>
+        /// Checks the help flags and the number of errors and shows
+        /// the usage and exception if necessary
+        /// </summary>
+        /// <returns>true, if no usage was shown</returns>
+        private bool ShowUsageIfNecessary()
+        {
             if (this.errors.Count > 0)
             {
                 this.ShowUsageAndException();
-                return false;
+                return true;
             }
 
             if (this.NamedArguments.ContainsKey("help")
@@ -203,10 +222,10 @@ namespace BurnSystems.CommandLine
                 || this.NamedArguments.ContainsKey("?"))
             {
                 this.ShowUsage();
-                return false;
+                return true;
             }
 
-            return true;
+            return false;
         }
 
         /// <summary>

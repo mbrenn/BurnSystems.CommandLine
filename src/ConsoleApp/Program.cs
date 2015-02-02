@@ -23,11 +23,12 @@ namespace ConsoleApp
             }*/
 
             var arguments = Parser.ParseIntoOrShowUsage<ProgramArguments>(args);
-            if (arguments != null )
+            if (arguments != null)
             {
                 Console.WriteLine("Input: " + arguments.Input);
                 Console.WriteLine("Output: " + arguments.Output);
                 Console.WriteLine("Verbose: " + arguments.Verbose);
+                Console.WriteLine("Duration: " + arguments.Duration);
             }
         }
     }

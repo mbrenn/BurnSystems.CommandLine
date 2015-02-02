@@ -163,7 +163,7 @@ namespace BurnSystems.CommandLine.ByAttributes
         /// Parses the retrieved object into the a new given object
         /// </summary>
         /// <returns>The object, receiving the arguments</returns>
-        public T ParseIntoObject()
+        public T FillObject()
         {
             if (this.parser == null)
             {
