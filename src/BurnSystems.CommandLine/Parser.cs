@@ -1,6 +1,7 @@
 
 namespace BurnSystems.CommandLine
 {
+    using BurnSystems.CommandLine.ByAttributes;
     using BurnSystems.CommandLine.Helper;
     using System;
     using System.Collections.Generic;
@@ -116,6 +117,26 @@ namespace BurnSystems.CommandLine
         }
 
         /// <summary>
+        /// Parses the value into the a new instance of the given object type
+        /// </summary>
+        /// <typeparam name="T">Type to be created </typeparam>
+        /// <returns>The created type, which received the argument</returns>
+        /// <remarks>This class somehow violates the layering between Parser and the 
+        /// attribute-driven parser. To ease the use of the attribute-driven parser, 
+        /// the static method is included here and not in the class ByAttributeParser</remarks>
+        public static T ParseIntoOrShowUsage<T>(string[] args) where T : class, new()
+        {
+            var byAttributeParser = new ByAttributeParser<T>();
+            var parser = byAttributeParser.PrepareParser(args);
+            if (!parser.ParseOrShowUsage())
+            {
+                return null;
+            }
+
+            return byAttributeParser.ParseIntoObject();
+        }
+
+        /// <summary>
         /// Initializes a new instance of the CommandLineEvaluator class.
         /// </summary>
         /// <param name="arguments">List of program arguments</param>
@@ -138,7 +159,10 @@ namespace BurnSystems.CommandLine
         public Parser(string[] arguments, IEnumerable<ICommandLineFilter> definitions)
             : this(arguments)
         {
-            this.filters.AddRange(definitions);
+            if (definitions != null)
+            {
+                this.filters.AddRange(definitions);
+            }
         }
 
         /// <summary>
@@ -233,7 +257,7 @@ namespace BurnSystems.CommandLine
                 {
                     // Default argument with long name
                     var argumentName = argument.Substring(2);
-                    n = AddValueToNamedArgument(n, argumentName);
+                    AddValueToNamedArgument(ref n, argumentName);
                 }
                 else if (argument[0] == '-')
                 {
@@ -285,7 +309,7 @@ namespace BurnSystems.CommandLine
                         this.AddError("Shortname " + cChar + " has a value and is used with other options");
                     }
 
-                    n = this.AddValueToNamedArgument(n, info.LongName);
+                    this.AddValueToNamedArgument(ref n, info.LongName);
                 }
             }
 
@@ -298,7 +322,7 @@ namespace BurnSystems.CommandLine
         /// <param name="n">Position, where the argument name was found</param>
         /// <param name="argumentName">Name of the argument being used</param>
         /// <returns>The new position to be used for the parsing</returns>
-        private int AddValueToNamedArgument(int n, string argumentName)
+        private void AddValueToNamedArgument(ref int n, string argumentName)
         {
             // Supports the named arguments with values
             var info =
@@ -321,8 +345,6 @@ namespace BurnSystems.CommandLine
                     this.namedArguments[argumentName] = arguments[n];
                 }
             }
-
-            return n;
         }
 
         /// <summary>
