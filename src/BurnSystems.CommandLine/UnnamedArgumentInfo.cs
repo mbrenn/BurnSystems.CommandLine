@@ -21,5 +21,10 @@ namespace BurnSystems.CommandLine
             get;
             set;
         }
+
+        public override string ToString()
+        {
+            return string.Format("Argument {0}", this.Index);
+        }
     }
 }

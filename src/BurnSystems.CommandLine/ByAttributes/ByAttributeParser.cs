@@ -179,7 +179,7 @@ namespace BurnSystems.CommandLine.ByAttributes
                 }
                 catch (Exception exc)
                 {
-                    this.parser.AddError("Error occured during parsing of '"+ action.ArgumentInfo.ToString() + ": " + exc.Message);
+                    this.parser.AddError("Error occured during parsing of '"+ action.ArgumentInfo.ToString() + "': " + exc.Message);
                 }
             }
 

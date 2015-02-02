@@ -431,47 +431,34 @@ namespace BurnSystems.CommandLine
             writer.WriteLine("Options: ");
 
             // Finds the maximum length of the argument
-            var unnamedArgumentInfos = this.UnnamedArgumentInfos.ToList();
-            var namedArgumentInfos = this.NamedArgumentInfos.ToList();
+            var argumentInfos = this.argumentInfos.ToList();
             int maxLength = 0;
-            if (unnamedArgumentInfos.Count > 0)
-            {
-                maxLength = "Argument x".Length;
-            }
 
-            if (namedArgumentInfos.Count() > 0)
+            if (argumentInfos.Count() > 0)
             {
                 maxLength =
                     Math.Max(
                         maxLength,
-                        namedArgumentInfos.Max(x => x.LongName.Length));
+                        argumentInfos.Max(x => x.ToString().Length));
             }
 
-            // Gets the unnamed arguments
-            var n = 0;
-            foreach (var argumentInfo in this.UnnamedArgumentInfos)
+            // Gets the maximum length of the arguments
+            foreach (var argumentInfo in argumentInfos)
             {
-                n++;
-                var argumentName =
-                    string.Format("Argument {0}", n);
-                writer.WriteLine(
-                    string.Format(
-                        "    --{0}{1}",
-                        StringManipulation.PaddingRight(argumentName, maxLength + 4),
-                        argumentInfo.HelpText));
-            }
-
-            // No arguments, no information
-            if (namedArgumentInfos.Count() > 0)
-            {
-                // Gets the maximum length of the arguments
-                foreach (var argumentInfo in namedArgumentInfos)
+                if (!string.IsNullOrEmpty(argumentInfo.HelpText))
                 {
                     writer.WriteLine(
                         string.Format(
-                            "    --{0}{1}",
-                            StringManipulation.PaddingRight(argumentInfo.LongName, maxLength + 4),
+                            "    --{0}: {1}",
+                            StringManipulation.PaddingRight(argumentInfo.ToString(), maxLength + 3),
                             argumentInfo.HelpText));
+                }
+                else
+                {
+                    writer.WriteLine(
+                        string.Format(
+                            "    --{0}",
+                            StringManipulation.PaddingRight(argumentInfo.ToString(), maxLength + 3)));
                 }
             }
         }
