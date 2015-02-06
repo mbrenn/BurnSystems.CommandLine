@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BurnSystems.CommandLine.ByAttributes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,7 @@ namespace ConsoleApp
 {
     public class ProgramArguments
     {
+        [NamedArgument(IsRequired=true)]
         public string Input
         {
             get;

@@ -11,9 +11,11 @@ namespace ConsoleApp
     {
         static void Main(string[] args)
         {
-            var type = 1;
+            var type = 2;
             if (type == 1)
             {
+                Console.WriteLine("Program is being executed via NON-ATTRIBUTE configuration");
+
                 var evaluator = new Parser(args)
                     .WithArgument("input", hasValue: true, helpText: "Secret", isRequired: true, shortName: 'i')
                     .WithArgument("output", hasValue: true, shortName: 'o')
@@ -27,6 +29,8 @@ namespace ConsoleApp
             }
             else if (type == 2)
             {
+                Console.WriteLine("Program is being executed via ATTRIBUTE configuration");
+
                 var arguments = Parser.ParseIntoOrShowUsage<ProgramArguments>(args);
                 if (arguments != null)
                 {
