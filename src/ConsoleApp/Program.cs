@@ -11,7 +11,7 @@ namespace ConsoleApp
     {
         static void Main(string[] args)
         {
-            var type = 1;
+            var type = 2;
             if (type == 1)
             {
                 var evaluator = new Parser(args)

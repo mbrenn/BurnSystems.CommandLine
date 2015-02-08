@@ -46,13 +46,77 @@ namespace BurnSystems.CommandLine.ByAttributes
 
             // Go through the properties
             foreach (var property in type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
-            {
-                var propertyType = property.PropertyType;
-
+            {   
                 // Per default, a named argument info is created
-                var argumentInfo = new NamedArgumentInfo();
-                argumentInfo.LongName = property.Name;
+                var argumentInfo = new NamedArgumentInfo() as ArgumentInfo;
 
+                // Gets the attribute
+                var attributeNamedArgument = property.GetCustomAttribute(typeof(NamedArgumentAttribute)) as NamedArgumentAttribute;
+                var attributeUnnamedArgument = property.GetCustomAttribute(typeof(UnnamedArgumentAttribute)) as UnnamedArgumentAttribute;
+                ArgumentInfoAttribute attributeArgument = 
+                    attributeNamedArgument == null ? 
+                        attributeUnnamedArgument as ArgumentInfoAttribute :
+                        attributeNamedArgument as ArgumentInfoAttribute;
+
+                // Defines the getter to retrieve the data
+                Func<string> getter;
+
+                if (argumentInfo is NamedArgumentInfo)
+                {
+                    var namedArgumentInfo = argumentInfo as NamedArgumentInfo;
+                    namedArgumentInfo.LongName = property.Name;
+
+                    if (attributeNamedArgument != null)
+                    {
+                        if (!string.IsNullOrEmpty(attributeNamedArgument.LongName))
+                        {
+                            namedArgumentInfo.LongName = attributeNamedArgument.LongName;
+                        }
+
+                        if (attributeNamedArgument.ShortName != '\0')
+                        {
+                            namedArgumentInfo.ShortName = attributeNamedArgument.ShortName;
+                        }
+                    }
+
+                    getter = () => parser.NamedArguments[namedArgumentInfo.LongName];
+                }
+                else if (argumentInfo is UnnamedArgumentInfo)
+                {
+                    var unnamedArgumentInfo = argumentInfo as UnnamedArgumentInfo;
+                    if (attributeUnnamedArgument != null)
+                    {
+                        if (attributeUnnamedArgument.Index != 0)
+                        {
+                            unnamedArgumentInfo.Index = attributeUnnamedArgument.Index;
+                        }
+                    }
+
+                    getter = () => parser.UnnamedArguments[unnamedArgumentInfo.Index];
+                }
+                else
+                {
+                    throw new NotImplementedException("Unexpected argument info type: " + argumentInfo.GetType().ToString());
+                }
+
+                // Parses the rest of the attribute
+                if (attributeArgument != null)
+                {
+                    if (!string.IsNullOrEmpty(attributeNamedArgument.HelpText))
+                    {
+                        argumentInfo.HelpText = attributeNamedArgument.HelpText;
+                    }
+
+                    if (!string.IsNullOrEmpty(attributeNamedArgument.DefaultValue))
+                    {
+                        argumentInfo.DefaultValue = attributeNamedArgument.DefaultValue;
+                    }
+
+                    argumentInfo.IsRequired = attributeNamedArgument.IsRequired;
+                }
+
+                // Now convert the type
+                var propertyType = property.PropertyType;
                 if (propertyType == typeof(bool))
                 {
                     argumentInfo.HasValue = false;
@@ -62,7 +126,7 @@ namespace BurnSystems.CommandLine.ByAttributes
                         {
                             property.SetValue(
                                 value,
-                                ConvertToBoolean(this.parser.NamedArguments[argumentInfo.LongName]));
+                                ConvertToBoolean(getter()));
                         });
                 }
                 else if (propertyType == typeof(string))
@@ -74,7 +138,7 @@ namespace BurnSystems.CommandLine.ByAttributes
                         {
                             property.SetValue(
                                 value,
-                                this.parser.NamedArguments[argumentInfo.LongName]);
+                                getter());
                         });
                 }
                 else if (propertyType == typeof(int))
@@ -87,7 +151,7 @@ namespace BurnSystems.CommandLine.ByAttributes
                             property.SetValue(
                                 value,
                                 Convert.ToInt32(
-                                    this.parser.NamedArguments[argumentInfo.LongName],
+                                    getter(),
                                     CultureInfo.InvariantCulture));
                         });
                 }
@@ -101,7 +165,7 @@ namespace BurnSystems.CommandLine.ByAttributes
                             property.SetValue(
                                 value,
                                 Convert.ToDouble(
-                                    this.parser.NamedArguments[argumentInfo.LongName],
+                                    getter(),
                                     CultureInfo.InvariantCulture));
                         });
                 }
@@ -115,7 +179,7 @@ namespace BurnSystems.CommandLine.ByAttributes
                             property.SetValue(
                                 value,
                                 Convert.ToInt64(
-                                    this.parser.NamedArguments[argumentInfo.LongName],
+                                    getter(),
                                     CultureInfo.InvariantCulture));
                         });
                 }
@@ -129,7 +193,7 @@ namespace BurnSystems.CommandLine.ByAttributes
                             property.SetValue(
                                 value,
                                 TimeSpan.FromSeconds(Convert.ToInt32(
-                                    this.parser.NamedArguments[argumentInfo.LongName],
+                                    getter(),
                                     CultureInfo.InvariantCulture)));
                         });
                 }
