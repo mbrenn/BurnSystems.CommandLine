@@ -15,7 +15,7 @@ namespace BurnSystems.CommandLine.Test
         {
             var arguments = new string[] { "-f", "file1.txt" };
             var evaluator = new Parser(arguments)
-                .WithDefaultValue("g", "great");
+                .WithArgument("g", defaultValue: "great");
 
             Assert.That(evaluator.NamedArguments.Count(), Is.EqualTo(2));
             Assert.That(evaluator.NamedArguments.ContainsKey("g"), Is.True);
@@ -30,7 +30,7 @@ namespace BurnSystems.CommandLine.Test
         {
             var arguments = new string[] { "-f", "file1.txt" };
             var evaluator = new Parser(arguments)
-                .Requires("f");
+                .WithArgument("f", isRequired: true);
 
             Assert.That(evaluator.NamedArguments.Count(), Is.EqualTo(1));
             Assert.That(evaluator.NamedArguments.ContainsKey("g"), Is.False);
@@ -44,7 +44,7 @@ namespace BurnSystems.CommandLine.Test
         {
             var arguments = new string[] { "-f", "file1.txt" };
             var evaluator = new Parser(arguments)
-                .Requires("g");
+                .WithArgument("g", isRequired: true);
 
             Assert.That(evaluator.ParseOrShowUsage(), Is.False);
         }
@@ -54,7 +54,7 @@ namespace BurnSystems.CommandLine.Test
         {
             var arguments = new string[] { "-f", "file1.txt" };
             var evaluator = new Parser(arguments)
-                .Requires(1);
+                .WithArgument(1, isRequired: true);
 
             Assert.That(evaluator.NamedArguments.Count(), Is.EqualTo(1));
             Assert.That(evaluator.NamedArguments.ContainsKey("f"), Is.True);
@@ -67,7 +67,7 @@ namespace BurnSystems.CommandLine.Test
         {
             var arguments = new string[] { "-f", "file1.txt" };
             var evaluator = new Parser(arguments)
-                .Requires(2);
+                .WithArgument(2, isRequired: true);
 
             Assert.That(evaluator.ParseOrShowUsage(), Is.False);
         }
@@ -78,7 +78,7 @@ namespace BurnSystems.CommandLine.Test
             var arguments = new string[] { "-f", "file1.txt" };
             var evaluator = new Parser(arguments)
                 .WithArgument("f", hasValue: true)
-                .Requires(1);
+                .WithArgument(1, isRequired: true);
 
             Assert.That(evaluator.ParseOrShowUsage(), Is.False);
         }

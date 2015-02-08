@@ -73,10 +73,10 @@ namespace BurnSystems.CommandLine.Test
         [Test]
         public void TestUsageWithUnamedArgument()
         {
-            var args = new string[] { "--input", "input.txt", "--output" };
+            var args = new string[] { };
             var evaluator = new Parser(args)
-                .WithArgument(1, hasValue: true, helpText: "Secret")
-                .WithArgument(2, hasValue: true);
+                .WithArgument(1, helpText: "Secret")
+                .WithArgument(2);
 
             using (var writer = new StringWriter())
             {
