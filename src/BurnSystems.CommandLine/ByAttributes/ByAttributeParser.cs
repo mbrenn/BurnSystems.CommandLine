@@ -47,16 +47,24 @@ namespace BurnSystems.CommandLine.ByAttributes
             // Go through the properties
             foreach (var property in type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
             {   
-                // Per default, a named argument info is created
-                var argumentInfo = new NamedArgumentInfo() as ArgumentInfo;
-
                 // Gets the attribute
                 var attributeNamedArgument = property.GetCustomAttribute(typeof(NamedArgumentAttribute)) as NamedArgumentAttribute;
                 var attributeUnnamedArgument = property.GetCustomAttribute(typeof(UnnamedArgumentAttribute)) as UnnamedArgumentAttribute;
-                ArgumentInfoAttribute attributeArgument = 
+                var attributeArgument = 
                     attributeNamedArgument == null ? 
                         attributeUnnamedArgument as ArgumentInfoAttribute :
                         attributeNamedArgument as ArgumentInfoAttribute;
+                
+                // Per default, a named argument info is created
+                ArgumentInfo argumentInfo;
+                if (attributeUnnamedArgument != null)
+                {
+                    argumentInfo = new UnnamedArgumentInfo();
+                }
+                else
+                {
+                    argumentInfo = new NamedArgumentInfo();
+                }
 
                 // Defines the getter to retrieve the data
                 Func<string> getter;
@@ -79,7 +87,19 @@ namespace BurnSystems.CommandLine.ByAttributes
                         }
                     }
 
-                    getter = () => parser.NamedArguments[namedArgumentInfo.LongName];
+                    getter = () =>
+                    {
+                        string result;
+
+                        if (parser.NamedArguments.TryGetValue(namedArgumentInfo.LongName, out result))
+                        {
+                            return result;
+                        }
+                        else
+                        {
+                            return null;
+                        }
+                    };
                 }
                 else if (argumentInfo is UnnamedArgumentInfo)
                 {
@@ -92,7 +112,17 @@ namespace BurnSystems.CommandLine.ByAttributes
                         }
                     }
 
-                    getter = () => parser.UnnamedArguments[unnamedArgumentInfo.Index];
+                    getter = () =>
+                        {
+                            if (parser.UnnamedArguments.Count > unnamedArgumentInfo.Index)
+                            {
+                                return parser.UnnamedArguments[unnamedArgumentInfo.Index];
+                            }
+                            else
+                            {
+                                return null;
+                            }
+                        };
                 }
                 else
                 {
@@ -102,105 +132,20 @@ namespace BurnSystems.CommandLine.ByAttributes
                 // Parses the rest of the attribute
                 if (attributeArgument != null)
                 {
-                    if (!string.IsNullOrEmpty(attributeNamedArgument.HelpText))
+                    if (!string.IsNullOrEmpty(attributeArgument.HelpText))
                     {
-                        argumentInfo.HelpText = attributeNamedArgument.HelpText;
+                        argumentInfo.HelpText = attributeArgument.HelpText;
                     }
 
-                    if (!string.IsNullOrEmpty(attributeNamedArgument.DefaultValue))
+                    if (!string.IsNullOrEmpty(attributeArgument.DefaultValue))
                     {
-                        argumentInfo.DefaultValue = attributeNamedArgument.DefaultValue;
+                        argumentInfo.DefaultValue = attributeArgument.DefaultValue;
                     }
 
-                    argumentInfo.IsRequired = attributeNamedArgument.IsRequired;
+                    argumentInfo.IsRequired = attributeArgument.IsRequired;
                 }
 
-                // Now convert the type
-                var propertyType = property.PropertyType;
-                if (propertyType == typeof(bool))
-                {
-                    argumentInfo.HasValue = false;
-                    this.AddAction(
-                        argumentInfo,
-                        (value) =>
-                        {
-                            property.SetValue(
-                                value,
-                                ConvertToBoolean(getter()));
-                        });
-                }
-                else if (propertyType == typeof(string))
-                {
-                    argumentInfo.HasValue = true;
-                    this.AddAction(
-                        argumentInfo,
-                        (value) =>
-                        {
-                            property.SetValue(
-                                value,
-                                getter());
-                        });
-                }
-                else if (propertyType == typeof(int))
-                {
-                    argumentInfo.HasValue = true;
-                    this.AddAction(
-                        argumentInfo,
-                        (value) =>
-                        {
-                            property.SetValue(
-                                value,
-                                Convert.ToInt32(
-                                    getter(),
-                                    CultureInfo.InvariantCulture));
-                        });
-                }
-                else if (propertyType == typeof(double))
-                {
-                    argumentInfo.HasValue = true;
-                    this.AddAction(
-                        argumentInfo,
-                        (value) =>
-                        {
-                            property.SetValue(
-                                value,
-                                Convert.ToDouble(
-                                    getter(),
-                                    CultureInfo.InvariantCulture));
-                        });
-                }
-                else if (propertyType == typeof(long))
-                {
-                    argumentInfo.HasValue = true;
-                    this.AddAction(
-                        argumentInfo,
-                        (value) =>
-                        {
-                            property.SetValue(
-                                value,
-                                Convert.ToInt64(
-                                    getter(),
-                                    CultureInfo.InvariantCulture));
-                        });
-                }
-                else if (propertyType == typeof(TimeSpan))
-                {
-                    argumentInfo.HasValue = true;
-                    this.AddAction(
-                        argumentInfo,
-                        (value) =>
-                        {
-                            property.SetValue(
-                                value,
-                                TimeSpan.FromSeconds(Convert.ToInt32(
-                                    getter(),
-                                    CultureInfo.InvariantCulture)));
-                        });
-                }
-                else
-                {
-                    throw new InvalidOperationException("Unsupported type in the instance: " + propertyType.FullName);
-                }
+                this.HandlePropertyType(property, getter, argumentInfo);
 
                 parser.AddArgumentInfo(argumentInfo);
             }
@@ -208,19 +153,108 @@ namespace BurnSystems.CommandLine.ByAttributes
             return this.parser;
         }
 
+        /// <summary>
+        /// Handles the property type and adds the information to the given argumentInfo structure. 
+        /// The getter will be used to retrieve the arguments themselves from the parser. 
+        /// In addition, an action to fill the final object in method FillObject will be added to
+        /// this instance.
+        /// </summary>
+        /// <param name="property">Information about the property of the object</param>
+        /// <param name="getter">The getter to retrieve the value from the parser</param>
+        /// <param name="argumentInfo">Argumentinfo being used to fill the property</param>
+        private void HandlePropertyType(PropertyInfo property, Func<string> getter, ArgumentInfo argumentInfo)
+        {
+            // Now convert the type
+            var propertyType = property.PropertyType;
+            if (propertyType == typeof(bool))
+            {
+                argumentInfo.HasValue = false;
+                this.AddAction(
+                    argumentInfo,
+                    (value) =>
+                    {
+                        property.SetValue(
+                            value,
+                            ConvertToBoolean(getter()));
+                    });
+            }
+            else if (propertyType == typeof(string))
+            {
+                argumentInfo.HasValue = true;
+                this.AddAction(
+                    argumentInfo,
+                    (value) =>
+                    {
+                        property.SetValue(
+                            value,
+                            getter());
+                    });
+            }
+            else if (propertyType == typeof(int))
+            {
+                argumentInfo.HasValue = true;
+                this.AddAction(
+                    argumentInfo,
+                    (value) =>
+                    {
+                        property.SetValue(
+                            value,
+                            Convert.ToInt32(
+                                getter(),
+                                CultureInfo.InvariantCulture));
+                    });
+            }
+            else if (propertyType == typeof(double))
+            {
+                argumentInfo.HasValue = true;
+                this.AddAction(
+                    argumentInfo,
+                    (value) =>
+                    {
+                        property.SetValue(
+                            value,
+                            Convert.ToDouble(
+                                getter(),
+                                CultureInfo.InvariantCulture));
+                    });
+            }
+            else if (propertyType == typeof(long))
+            {
+                argumentInfo.HasValue = true;
+                this.AddAction(
+                    argumentInfo,
+                    (value) =>
+                    {
+                        property.SetValue(
+                            value,
+                            Convert.ToInt64(
+                                getter(),
+                                CultureInfo.InvariantCulture));
+                    });
+            }
+            else if (propertyType == typeof(TimeSpan))
+            {
+                argumentInfo.HasValue = true;
+                this.AddAction(
+                    argumentInfo,
+                    (value) =>
+                    {
+                        property.SetValue(
+                            value,
+                            TimeSpan.FromSeconds(Convert.ToInt32(
+                                getter(),
+                                CultureInfo.InvariantCulture)));
+                    });
+            }
+            else
+            {
+                throw new InvalidOperationException("Unsupported type in the instance: " + propertyType.FullName);
+            }
+        }
+
         private void AddAction(ArgumentInfo info, Action<T> action)
         {
             this.actions.Add(new ParseAction(info, action));
-        }
-
-        /// <summary>
-        /// Converts a string to a boolean by using some default arguments
-        /// </summary>
-        /// <param name="value">Value to be converted</param>
-        /// <returns>true, if the value represents a boolean with a value of true</returns>
-        private static bool ConvertToBoolean(string value)
-        {
-            return value == "1" || value == "y" || value == "True";
         }
 
         /// <summary>
@@ -272,6 +306,16 @@ namespace BurnSystems.CommandLine.ByAttributes
                 this.ArgumentInfo = info;
                 this.Action = action;
             }
+        }
+
+        /// <summary>
+        /// Converts a string to a boolean by using some default arguments
+        /// </summary>
+        /// <param name="value">Value to be converted</param>
+        /// <returns>true, if the value represents a boolean with a value of true</returns>
+        private static bool ConvertToBoolean(string value)
+        {
+            return value == "1" || value == "y" || value == "True";
         }
     }
 }

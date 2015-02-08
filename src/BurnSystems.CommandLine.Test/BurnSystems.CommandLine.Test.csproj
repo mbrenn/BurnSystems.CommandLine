@@ -48,6 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArgumentTests.cs" />
+    <Compile Include="ByReflectionTests.cs" />
     <Compile Include="CommandLineTests.cs" />
     <Compile Include="FilterTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

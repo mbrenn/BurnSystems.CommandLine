@@ -345,11 +345,15 @@ namespace BurnSystems.CommandLine
         {
             // Supports the named arguments with values
             var info =
-                this.NamedArgumentInfos.Where(x => x.LongName == argumentName).FirstOrDefault();
+                this.NamedArgumentInfos.Where(x => x.LongName.ToLower() == argumentName.ToLower()).FirstOrDefault();
 
-            if (info == null || !info.HasValue)
+            if (info == null)
             {
                 this.namedArguments[argumentName] = "1";
+            }
+            else if (!info.HasValue)
+            {
+                this.namedArguments[info.LongName] = "1";
             }
             else
             {
@@ -361,7 +365,7 @@ namespace BurnSystems.CommandLine
                 }
                 else
                 {
-                    this.namedArguments[argumentName] = arguments[n];
+                    this.namedArguments[info.LongName] = arguments[n];
                 }
             }
         }
