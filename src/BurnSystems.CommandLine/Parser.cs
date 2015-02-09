@@ -455,13 +455,14 @@ namespace BurnSystems.CommandLine
             }
 
             // Gets the maximum length of the arguments
-            foreach (var argumentInfo in argumentInfos)
+            foreach (var argumentInfo in argumentInfos
+                .OrderBy(x => x is NamedArgumentInfo ? 1 : 0))
             {
                 if (!string.IsNullOrEmpty(argumentInfo.HelpText))
                 {
                     writer.WriteLine(
                         string.Format(
-                            "    --{0}: {1}",
+                            "    {0}: {1}",
                             StringManipulation.PaddingRight(argumentInfo.ToString(), maxLength + 3),
                             argumentInfo.HelpText));
                 }
@@ -469,7 +470,7 @@ namespace BurnSystems.CommandLine
                 {
                     writer.WriteLine(
                         string.Format(
-                            "    --{0}",
+                            "    {0}",
                             StringManipulation.PaddingRight(argumentInfo.ToString(), maxLength + 3)));
                 }
             }
@@ -484,7 +485,7 @@ namespace BurnSystems.CommandLine
             if (this.errors.Count > 0)
             {
                 writer.WriteLine();
-                writer.WriteLine("An error occured during parsing:");
+                writer.WriteLine("The given arguments were incomplete:");
             }
 
             foreach (var error in this.errors)

@@ -38,13 +38,13 @@ namespace BurnSystems.CommandLine
             {
                 if ( this.ShortName == '\0')
                 {
-                    return this.LongName;
+                    return this.LongName.ToLower();
                 }
                 else
                 {
                     return string.Format(
-                        "{0} [{1}]",
-                        this.LongName,
+                        "--{0} [-{1}]",
+                        this.LongName.ToLower(),
                         this.ShortName);
                 }
             }

@@ -11,7 +11,7 @@ namespace ConsoleApp
     {
         static void Main(string[] args)
         {
-            var type = 2;
+            var type = 1;
             if (type == 1)
             {
                 Console.WriteLine("Program is being executed via NON-ATTRIBUTE configuration");
