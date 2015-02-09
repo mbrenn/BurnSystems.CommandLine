@@ -110,6 +110,12 @@ namespace BurnSystems.CommandLine.ByAttributes
                         {
                             unnamedArgumentInfo.Index = attributeUnnamedArgument.Index;
                         }
+                        else
+                        {
+                            // Auto increase, if an unnamed argument already exists and 
+                            // no index has been set
+                            unnamedArgumentInfo.Index = parser.UnnamedArgumentInfos.Count();
+                        }
                     }
 
                     getter = () =>

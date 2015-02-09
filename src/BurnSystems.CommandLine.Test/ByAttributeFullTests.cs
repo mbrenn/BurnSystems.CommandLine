@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace BurnSystems.CommandLine.Test
 {
     [TestFixture]
-    public class ByReflectionTests
+    public class ByAttributeFullTests
     {
         [Test]
         public void TestNoAttributes()
