@@ -25,6 +25,10 @@ namespace BurnSystems.CommandLine
 
         void ICommandLineFilter.AfterParsing(Parser evaluator)
         {
+            // Stores 
+            var maxArgumentsExceptionGiven = false;
+
+            // Goes through the arguments
             foreach (var argument in evaluator.ArgumentInfos)
             {
                 if (!argument.IsRequired)
@@ -46,9 +50,17 @@ namespace BurnSystems.CommandLine
 
                 if (unnamedArgument != null)
                 {
-                    if (unnamedArgument.Index >= evaluator.UnnamedArguments.Count)
+                    if (unnamedArgument.Index >= evaluator.UnnamedArguments.Count
+                        && !maxArgumentsExceptionGiven)
                     {
-                        if (unnamedArgument.Index == 0)
+                        maxArgumentsExceptionGiven = true;
+                        var maxIndex =
+                            evaluator.ArgumentInfos
+                                .Select(x => x as UnnamedArgumentInfo)
+                                .Where(x => x != null)
+                                .Max(x => x.Index);
+
+                        if (maxIndex == 0)
                         {
                             evaluator.AddError(
                                 string.Format(
@@ -59,7 +71,7 @@ namespace BurnSystems.CommandLine
                             evaluator.AddError(
                                 string.Format(
                                     "Not enough arguments were given. {0} arguments were expected",
-                                    unnamedArgument.Index + 1));
+                                    maxIndex + 1));
                         }
                     }
                 }

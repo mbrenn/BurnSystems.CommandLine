@@ -52,6 +52,20 @@ namespace BurnSystems.CommandLine.Test
             Assert.That(parser.UnnamedArgumentInfos.ElementAt(1).Index, Is.EqualTo(1));
 
             Assert.That(parser.NamedArgumentInfos.Count(), Is.EqualTo(0));
+
+            var result = attributeParser.FillObject();
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Input, Is.EqualTo("input"));
+            Assert.That(result.Output, Is.EqualTo("output"));
+
+            // Try to provoke an error
+            args = new string[] { };
+            attributeParser = new ByAttributeParser<TwoUnnamedParameters>();
+            parser = attributeParser.PrepareParser(args);
+            var parseResult = parser.ParseOrShowUsage();
+            result = attributeParser.FillObject();
+            Assert.That(parseResult, Is.False);
+            Assert.That(parser.Errors.Count, Is.EqualTo(1));
         }
 
         class Parameters
@@ -65,10 +79,10 @@ namespace BurnSystems.CommandLine.Test
 
         class TwoUnnamedParameters
         {
-            [UnnamedArgument]
+            [UnnamedArgument(IsRequired = true)]
             public string Input { get; set; }
 
-            [UnnamedArgument]
+            [UnnamedArgument(IsRequired = true)]
             public string Output { get; set; }
         }
     }

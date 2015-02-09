@@ -54,6 +54,14 @@ namespace BurnSystems.CommandLine
         private List<string> errors = new List<string>();
 
         /// <summary>
+        /// Gets the errors which occured during parsing
+        /// </summary>
+        internal List<string> Errors
+        {
+            get { return this.errors; }
+        }
+
+        /// <summary>
         /// Returns the argument information
         /// </summary>
         internal IEnumerable<ArgumentInfo> ArgumentInfos
