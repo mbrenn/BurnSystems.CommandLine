@@ -9,6 +9,7 @@ namespace BurnSystems.CommandLine
     using System.IO;
     using System.Linq;
     using System.Reflection;
+    using System.Text;
 
     /// <summary>
     /// Evaluates the command line
@@ -74,9 +75,12 @@ namespace BurnSystems.CommandLine
         /// </summary>
         internal IEnumerable<NamedArgumentInfo> NamedArgumentInfos
         {
-            get { return this.ArgumentInfos
-                .Select(x => x as NamedArgumentInfo)
-                .Where(x => x != null); }
+            get
+            {
+                return this.ArgumentInfos
+                    .Select(x => x as NamedArgumentInfo)
+                    .Where(x => x != null);
+            }
         }
 
         /// <summary>
@@ -271,7 +275,7 @@ namespace BurnSystems.CommandLine
             }
 
             // The actual parsing
-            for(var n = 0; n < arguments.Length; n++)
+            for (var n = 0; n < arguments.Length; n++)
             {
                 var argument = arguments[n];
                 if (string.IsNullOrEmpty(argument))
@@ -427,7 +431,7 @@ namespace BurnSystems.CommandLine
             }
 
             var assembly = Assembly.GetEntryAssembly();
-            
+
             if (assembly != null)
             {
                 writer.WriteLine(
@@ -462,11 +466,15 @@ namespace BurnSystems.CommandLine
             {
                 if (!string.IsNullOrEmpty(argumentInfo.HelpText))
                 {
+                    var argument = StringManipulation.PaddingRight(argumentInfo.ToString(), maxLength + 3);
                     writer.WriteLine(
-                        string.Format(
-                            "    {0}: {1}",
-                            StringManipulation.PaddingRight(argumentInfo.ToString(), maxLength + 3),
-                            argumentInfo.HelpText));
+                        IndentedFormat(
+                            string.Format(
+                                "    {0}: {1}",
+                                argument,
+                                argumentInfo.HelpText),
+                        argument.Length + 6,
+                        Console.BufferWidth));
                 }
                 else
                 {
@@ -476,6 +484,50 @@ namespace BurnSystems.CommandLine
                             StringManipulation.PaddingRight(argumentInfo.ToString(), maxLength + 3)));
                 }
             }
+        }
+
+        /// <summary>
+        /// Converts the given text to an indented text
+        /// </summary>
+        /// <param name="text">Text to be converted</param>
+        /// <param name="indent">Indentation to be done</param>
+        /// <returns>Returned the indented text that can be outputed to the console</returns>
+        private string IndentedFormat(string text, int indent, int width)
+        {
+            var buffer = new StringBuilder();
+
+            // Getsthe text
+            var indentTextBuffer = new StringBuilder();
+            for (var n = 0; n < indent; n++)
+            {
+                indentTextBuffer.Append(' ');
+            }
+
+            var indentText = indentTextBuffer.ToString();
+
+            // Now doing the text creation
+            var currentPosition = 0;
+            while (currentPosition < text.Length)
+            {
+                var lineWidth = currentPosition == 0 ? width : width - indent;
+                var restLength = text.Length - currentPosition;
+
+                var nextLength = Math.Min(lineWidth, restLength);
+
+                if (currentPosition == 0)
+                {
+                    buffer.Append(
+                        text.Substring(currentPosition, nextLength));
+                }
+                else
+                {
+                    buffer.Append(indentText + text.Substring(currentPosition, nextLength));
+                }
+
+                currentPosition += nextLength;
+            }
+
+            return buffer.ToString();
         }
 
         /// <summary>

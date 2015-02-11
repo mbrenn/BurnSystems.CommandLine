@@ -16,7 +16,7 @@ namespace ConsoleApp
             set;
         }
 
-        [UnnamedArgument(IsRequired = true, HelpText = "Path where compiled content will be stored")]
+        [UnnamedArgument(IsRequired = true, HelpText = "Path where compiled content will be stored. This is a really long text which has a line wrap")]
         public string Output
         {
             get;
