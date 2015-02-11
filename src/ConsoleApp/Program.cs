@@ -31,13 +31,13 @@ namespace ConsoleApp
             {
                 Console.WriteLine("Program is being executed via ATTRIBUTE configuration");
 
-                var arguments = Parser.ParseIntoOrShowUsage<ProgramArguments>(args);
-                if (arguments != null)
+                var argument = Parser.ParseIntoOrShowUsage<ProgramArguments>(args);
+                if (argument != null)
                 {
-                    Console.WriteLine("Input: " + arguments.Input);
-                    Console.WriteLine("Output: " + arguments.Output);
-                    Console.WriteLine("Verbose: " + arguments.Verbose);
-                    Console.WriteLine("Duration: " + arguments.Duration);
+                    Console.WriteLine("Input: " + argument.Input);
+                    Console.WriteLine("Output: " + argument.Output);
+                    Console.WriteLine("Verbose: " + argument.Verbose);
+                    Console.WriteLine("Duration: " + argument.Duration);
                 }
             }
         }
