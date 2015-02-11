@@ -23,5 +23,31 @@ namespace BurnSystems.CommandLine
             get;
             set;
         }
+
+        /// <summary>
+        /// Converts the named argument to string
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            if (string.IsNullOrEmpty(this.LongName))
+            {
+                return "Unknown Argument";
+            }
+            else
+            {
+                if ( this.ShortName == '\0')
+                {
+                    return this.LongName.ToLower();
+                }
+                else
+                {
+                    return string.Format(
+                        "--{0} [-{1}]",
+                        this.LongName.ToLower(),
+                        this.ShortName);
+                }
+            }
+        }
     }
 }

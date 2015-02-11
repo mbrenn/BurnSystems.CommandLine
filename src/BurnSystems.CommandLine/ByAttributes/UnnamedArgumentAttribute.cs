@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BurnSystems.CommandLine
-{
+namespace BurnSystems.CommandLine.ByAttributes
+{ 
     /// <summary>
-    /// Stores the information to a specific argument, 
-    /// that will be automatically parsed
-    /// </summary>
-    internal class UnnamedArgumentInfo : ArgumentInfo
+    /// Replicates the information from the NamedArgumentInfo so 
+    /// it can be used within an attribute to configure the program arguments type
+    /// </summary>    
+    public class UnnamedArgumentAttribute : ArgumentInfoAttribute
     {
         /// <summary>
         /// Gets or sets the index where the parameter is located. 
@@ -20,11 +20,6 @@ namespace BurnSystems.CommandLine
         {
             get;
             set;
-        }
-
-        public override string ToString()
-        {
-            return string.Format("Argument {0}", this.Index + 1);
         }
     }
 }

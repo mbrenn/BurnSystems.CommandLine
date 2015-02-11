@@ -19,11 +19,11 @@ The commandline can be simply used:
 
 The main syntax for an application without any argument-configuration is given as the following: 
 
-    consoleapp.exe file1.txt file2.txt -o -p -a --abc
+    consoleapp.exe --input file1.txt --output file2.txt abc.cfg -o 
 
-The unnamed arguments, which are retrievable via **parser.UnnamedArguments as List<string>** will contain two elements: file1.txt, file2.txt
+The unnamed arguments, which are retrievable via **parser.UnnamedArguments as List<string>** will contain one element: abc.cfg
 
-The name arguments, which are retrievable via **parser.NamedArguments as Dictionary<string, string>** will contain four elements: o="1", p="1", a="1" and abc="1".
+The named arguments, which are retrievable via **parser.NamedArguments as Dictionary<string, string>** will contain four elements: input="file1.txt", output="file2.txt" and o="1".
 
 ## Argument definition
 
@@ -46,21 +46,25 @@ This will make the parser return the following two named arguments:
 * input: input.txt
 * output: output.txt
 
-## Short options
+## Short names
 
 By defining the short name for an option, which consists of one character, the length of the 
 arguments can be shortened.
 
     var parser = new Parser(args)
         .WithArgument("input", hasValue: true, shortName: 'i')
-        .WithArgument("output", hasValue: true, shortName: 'o');
+        .WithArgument("output", hasValue: true, shortName: 'o')
+		.WithArgument("verbose", shortname: 'v')
+		.WithArgument("standard", shortname: 's');
 
 The following statement will be evaluated with the long names: 
 
-    consoleapp.exe -i input.txt -o output.txt
+    consoleapp.exe -i input.txt -o output.txt -sv
 
 * input: input.txt
 * output: output.txt
+* verbose: 1
+* standard: 1
 
 ## Mandatory Value
 

@@ -11,15 +11,34 @@ namespace ConsoleApp
     {
         static void Main(string[] args)
         {
-            var evaluator = new Parser(args)
-                .WithArgument("input", hasValue: true, helpText: "Secret", isRequired: true)
-                .WithArgument("output", hasValue: true)
-                .WithArgument(0, helpText: "Input file", isRequired: true)
-                .WithArgument(1, helpText: "Output file");
-
-            if (evaluator.ParseOrShowUsage())
+            var type = 2;
+            if (type == 1)
             {
-                Console.WriteLine("Success");
+                Console.WriteLine("Program is being executed via NON-ATTRIBUTE configuration");
+
+                var evaluator = new Parser(args)
+                    .WithArgument("input", hasValue: true, helpText: "Secret", isRequired: true, shortName: 'i')
+                    .WithArgument("output", hasValue: true, shortName: 'o')
+                    .WithArgument(0, helpText: "Input file", isRequired: true)
+                    .WithArgument(1, helpText: "Output file");
+
+                if (evaluator.ParseOrShowUsage())
+                {
+                    Console.WriteLine("Success");
+                }
+            }
+            else if (type == 2)
+            {
+                Console.WriteLine("Program is being executed via ATTRIBUTE configuration");
+
+                var arguments = Parser.ParseIntoOrShowUsage<ProgramArguments>(args);
+                if (arguments != null)
+                {
+                    Console.WriteLine("Input: " + arguments.Input);
+                    Console.WriteLine("Output: " + arguments.Output);
+                    Console.WriteLine("Verbose: " + arguments.Verbose);
+                    Console.WriteLine("Duration: " + arguments.Duration);
+                }
             }
         }
     }

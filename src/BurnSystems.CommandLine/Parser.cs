@@ -1,6 +1,7 @@
 
 namespace BurnSystems.CommandLine
 {
+    using BurnSystems.CommandLine.ByAttributes;
     using BurnSystems.CommandLine.Helper;
     using System;
     using System.Collections.Generic;
@@ -8,12 +9,18 @@ namespace BurnSystems.CommandLine
     using System.IO;
     using System.Linq;
     using System.Reflection;
+    using System.Text;
 
     /// <summary>
     /// Evaluates the command line
     /// </summary>
     public class Parser
     {
+        /// <summary>
+        /// Stores the usage writer
+        /// </summary>
+        private UsageWriter usageWriter;
+
         /// <summary>
         /// Nichtbenannte Argument
         /// </summary>
@@ -53,6 +60,14 @@ namespace BurnSystems.CommandLine
         private List<string> errors = new List<string>();
 
         /// <summary>
+        /// Gets the errors which occured during parsing
+        /// </summary>
+        internal List<string> Errors
+        {
+            get { return this.errors; }
+        }
+
+        /// <summary>
         /// Returns the argument information
         /// </summary>
         internal IEnumerable<ArgumentInfo> ArgumentInfos
@@ -65,9 +80,12 @@ namespace BurnSystems.CommandLine
         /// </summary>
         internal IEnumerable<NamedArgumentInfo> NamedArgumentInfos
         {
-            get { return this.ArgumentInfos
-                .Select(x => x as NamedArgumentInfo)
-                .Where(x => x != null); }
+            get
+            {
+                return this.ArgumentInfos
+                    .Select(x => x as NamedArgumentInfo)
+                    .Where(x => x != null);
+            }
         }
 
         /// <summary>
@@ -116,6 +134,34 @@ namespace BurnSystems.CommandLine
         }
 
         /// <summary>
+        /// Parses the value into the a new instance of the given object type
+        /// </summary>
+        /// <typeparam name="T">Type to be created </typeparam>
+        /// <returns>The created type, which received the argument</returns>
+        /// <remarks>This class somehow violates the layering between Parser and the 
+        /// attribute-driven parser. To ease the use of the attribute-driven parser, 
+        /// the static method is included here and not in the class ByAttributeParser</remarks>
+        public static T ParseIntoOrShowUsage<T>(string[] args) where T : class, new()
+        {
+            var byAttributeParser = new ByAttributeParser<T>();
+            var parser = byAttributeParser.PrepareParser(args);
+            parser.Parse();
+
+            if (parser.ShowUsageIfNecessary())
+            {
+                return null;
+            }
+
+            var result = byAttributeParser.FillObject();
+            if (parser.ShowUsageIfNecessary())
+            {
+                return null;
+            }
+
+            return result;
+        }
+
+        /// <summary>
         /// Initializes a new instance of the CommandLineEvaluator class.
         /// </summary>
         /// <param name="arguments">List of program arguments</param>
@@ -125,6 +171,8 @@ namespace BurnSystems.CommandLine
             Contract.EndContractBlock();
 
             this.arguments = arguments;
+
+            this.usageWriter = new UsageWriter(this);
 
             this.filters.Add(new DefaultValueFilter());
             this.filters.Add(new RequiredFilter());
@@ -138,7 +186,10 @@ namespace BurnSystems.CommandLine
         public Parser(string[] arguments, IEnumerable<ICommandLineFilter> definitions)
             : this(arguments)
         {
-            this.filters.AddRange(definitions);
+            if (definitions != null)
+            {
+                this.filters.AddRange(definitions);
+            }
         }
 
         /// <summary>
@@ -164,25 +215,36 @@ namespace BurnSystems.CommandLine
         /// Parses the arguments and shows the usage, if it the parsing did not complete.
         /// True, if parsing was successful
         /// </summary>
+        /// <returns>True, when parsing was successful</returns>
         public bool ParseOrShowUsage()
         {
             this.Parse();
 
+            return !this.ShowUsageIfNecessary();
+        }
+
+        /// <summary>
+        /// Checks the help flags and the number of errors and shows
+        /// the usage and exception if necessary
+        /// </summary>
+        /// <returns>true, if no usage was shown</returns>
+        private bool ShowUsageIfNecessary()
+        {
             if (this.errors.Count > 0)
             {
-                this.ShowUsageAndException();
-                return false;
+                this.usageWriter.ShowUsageAndException();
+                return true;
             }
 
             if (this.NamedArguments.ContainsKey("help")
                 || this.NamedArguments.ContainsKey("h")
                 || this.NamedArguments.ContainsKey("?"))
             {
-                this.ShowUsage();
-                return false;
+                this.usageWriter.ShowUsage();
+                return true;
             }
 
-            return true;
+            return false;
         }
 
         /// <summary>
@@ -220,7 +282,7 @@ namespace BurnSystems.CommandLine
             }
 
             // The actual parsing
-            for(var n = 0; n < arguments.Length; n++)
+            for (var n = 0; n < arguments.Length; n++)
             {
                 var argument = arguments[n];
                 if (string.IsNullOrEmpty(argument))
@@ -233,7 +295,7 @@ namespace BurnSystems.CommandLine
                 {
                     // Default argument with long name
                     var argumentName = argument.Substring(2);
-                    n = AddValueToNamedArgument(n, argumentName);
+                    AddValueToNamedArgument(ref n, argumentName);
                 }
                 else if (argument[0] == '-')
                 {
@@ -285,7 +347,7 @@ namespace BurnSystems.CommandLine
                         this.AddError("Shortname " + cChar + " has a value and is used with other options");
                     }
 
-                    n = this.AddValueToNamedArgument(n, info.LongName);
+                    this.AddValueToNamedArgument(ref n, info.LongName);
                 }
             }
 
@@ -298,15 +360,19 @@ namespace BurnSystems.CommandLine
         /// <param name="n">Position, where the argument name was found</param>
         /// <param name="argumentName">Name of the argument being used</param>
         /// <returns>The new position to be used for the parsing</returns>
-        private int AddValueToNamedArgument(int n, string argumentName)
+        private void AddValueToNamedArgument(ref int n, string argumentName)
         {
             // Supports the named arguments with values
             var info =
-                this.NamedArgumentInfos.Where(x => x.LongName == argumentName).FirstOrDefault();
+                this.NamedArgumentInfos.Where(x => x.LongName.ToLower() == argumentName.ToLower()).FirstOrDefault();
 
-            if (info == null || !info.HasValue)
+            if (info == null)
             {
                 this.namedArguments[argumentName] = "1";
+            }
+            else if (!info.HasValue)
+            {
+                this.namedArguments[info.LongName] = "1";
             }
             else
             {
@@ -318,11 +384,9 @@ namespace BurnSystems.CommandLine
                 }
                 else
                 {
-                    this.namedArguments[argumentName] = arguments[n];
+                    this.namedArguments[info.LongName] = arguments[n];
                 }
             }
-
-            return n;
         }
 
         /// <summary>
@@ -332,125 +396,6 @@ namespace BurnSystems.CommandLine
         public void AddError(string error)
         {
             this.errors.Add(error);
-        }
-
-        /// <summary>
-        /// Shows the exception and the usage argument
-        /// </summary>
-        /// <param name="exc">Exception being used</param>
-        private void ShowUsageAndException()
-        {
-            using (var writer = new StringWriter())
-            {
-                this.WriteIntroduction(writer);
-                this.WriteErrors(writer);
-                this.WriteUsage(writer);
-
-                Console.WriteLine(writer.GetStringBuilder().ToString());
-            }
-        }
-
-        /// <summary>
-        /// Shows the usage
-        /// </summary>
-        private void ShowUsage()
-        {
-            using (var writer = new StringWriter())
-            {
-                this.WriteIntroduction(writer);
-                this.WriteUsage(writer);
-
-                Console.WriteLine(writer.GetStringBuilder().ToString());
-            }
-        }
-
-        public void WriteIntroduction(TextWriter writer)
-        {
-            var options = string.Empty;
-
-            if (this.argumentInfos.Count > 0)
-            {
-                options = " {options}";
-            }
-
-            var assembly = Assembly.GetEntryAssembly();
-
-            if (assembly != null)
-            {
-                writer.WriteLine(
-                    string.Format("{0}{1}",
-                        Path.GetFileName(Assembly.GetEntryAssembly().Location),
-                        options));
-            }
-        }
-
-        public void WriteUsage(TextWriter writer)
-        {
-            writer.WriteLine();
-            writer.WriteLine("Options: ");
-
-            // Finds the maximum length of the argument
-            var unnamedArgumentInfos = this.UnnamedArgumentInfos.ToList();
-            var namedArgumentInfos = this.NamedArgumentInfos.ToList();
-            int maxLength = 0;
-            if (unnamedArgumentInfos.Count > 0)
-            {
-                maxLength = "Argument x".Length;
-            }
-
-            if (namedArgumentInfos.Count() > 0)
-            {
-                maxLength =
-                    Math.Max(
-                        maxLength,
-                        namedArgumentInfos.Max(x => x.LongName.Length));
-            }
-
-            // Gets the unnamed arguments
-            var n = 0;
-            foreach (var argumentInfo in this.UnnamedArgumentInfos)
-            {
-                n++;
-                var argumentName =
-                    string.Format("Argument {0}", n);
-                writer.WriteLine(
-                    string.Format(
-                        "    --{0}{1}",
-                        StringManipulation.PaddingRight(argumentName, maxLength + 4),
-                        argumentInfo.HelpText));
-            }
-
-            // No arguments, no information
-            if (namedArgumentInfos.Count() > 0)
-            {
-                // Gets the maximum length of the arguments
-                foreach (var argumentInfo in namedArgumentInfos)
-                {
-                    writer.WriteLine(
-                        string.Format(
-                            "    --{0}{1}",
-                            StringManipulation.PaddingRight(argumentInfo.LongName, maxLength + 4),
-                            argumentInfo.HelpText));
-                }
-            }
-        }
-
-        /// <summary>
-        /// Writes the errors given during the parsing
-        /// </summary>
-        /// <param name="writer">Writer to be used</param>
-        public void WriteErrors(TextWriter writer)
-        {
-            if (this.errors.Count > 0)
-            {
-                writer.WriteLine();
-                writer.WriteLine("An error occured during parsing:");
-            }
-
-            foreach (var error in this.errors)
-            {
-                writer.WriteLine("  " + error);
-            }
         }
     }
 }
