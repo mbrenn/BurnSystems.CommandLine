@@ -61,7 +61,7 @@ namespace BurnSystems.CommandLine.Test
 
             using (var writer = new StringWriter())
             {
-                evaluator.WriteUsage(writer);
+                new UsageWriter(evaluator).WriteUsage(writer);
                 
                 var usageText = writer.GetStringBuilder().ToString();
                 Assert.That(usageText.Contains("input"), Is.True);
@@ -80,7 +80,7 @@ namespace BurnSystems.CommandLine.Test
 
             using (var writer = new StringWriter())
             {
-                evaluator.WriteUsage(writer);
+                new UsageWriter(evaluator).WriteUsage(writer);
 
                 var usageText = writer.GetStringBuilder().ToString();
                 Assert.That(usageText.Contains("Secret"), Is.True);
@@ -95,7 +95,7 @@ namespace BurnSystems.CommandLine.Test
 
             using (var writer = new StringWriter())
             {
-                evaluator.WriteUsage(writer);
+                new UsageWriter(evaluator).WriteUsage(writer);
 
                 var usageText = writer.GetStringBuilder().ToString();
                 Assert.That(usageText.Length, Is.GreaterThan(0));
