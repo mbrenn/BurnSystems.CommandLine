@@ -37,7 +37,7 @@ The arguments in command line can directly be parsed into a .Net Object
 
 ## Call of application
 
-    ConsoleApp.exe input.txt output.txt -v -d 10
+    > ConsoleApp.exe input.txt output.txt -v -d 10
 
     Input: input.txt
     Output: output.txt
