@@ -427,13 +427,15 @@ namespace BurnSystems.CommandLine
             }
 
             var assembly = Assembly.GetEntryAssembly();
-
+            
             if (assembly != null)
             {
                 writer.WriteLine(
                     string.Format("{0}{1}",
                         Path.GetFileName(Assembly.GetEntryAssembly().Location),
                         options));
+
+                writer.WriteLine("Version: {0}", assembly.GetName().Version.ToString());
             }
         }
 
