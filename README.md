@@ -4,6 +4,10 @@ The commandline parser takes the arguments as given from the Main(string[] args)
 them for easy access. It supports an argument syntax including switches, named arguments or 
 filespecifications. 
 
+Installation via NuGet: 
+
+> Install-Package BurnSystems.CommandLine 
+
 # Attribute driven usage
 
 The arguments in command line can directly be parsed into a .Net Object
