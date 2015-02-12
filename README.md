@@ -1,10 +1,24 @@
 # BurnSystems.CommandLine
 
-The commandline parser takes the arguments as given from the Main(string[] args)-function and will prepare
+The commandline parser takes the arguments as given from the *Main(string[] args)*-function and will prepare
 them for easy access. It supports an argument syntax including switches, named arguments or 
-filespecifications. 
+file specifications. 
 
-Installation via NuGet: 
+    ConsoleApp.exe file1.txt file2.txt --longargument -vfu -d 10
+
+## Feature List
+
+- Named arguments long names (--)
+- Automatic translation of shortnames (-)
+- Unnamed arguments
+- Default value for arguments
+- Enforce argument definition
+- Automatic creation of usage information
+- Manual access to arguments and automatic setting via .Net-Reflections 
+
+[Version-Information](versions.md "Version-Information")
+
+## Installation via NuGet: 
 
 > Install-Package BurnSystems.CommandLine 
 
@@ -180,3 +194,4 @@ extension method can be used:
         .WithDefaultValue("g", "great");
         
 When there is no named argument, the named argument will contain the value "great". 
+
