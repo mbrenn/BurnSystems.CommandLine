@@ -36,9 +36,11 @@ namespace BurnSystems.CommandLine
             }
             else
             {
-                if ( this.ShortName == '\0')
+                if (this.ShortName == '\0')
                 {
-                    return this.LongName.ToLower();
+                    return string.Format(
+                        "--{0}",
+                        this.LongName.ToLower());
                 }
                 else
                 {

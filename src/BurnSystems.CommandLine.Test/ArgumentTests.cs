@@ -12,6 +12,20 @@ namespace BurnSystems.CommandLine.Test
     public class ArgumentTests
     {
         [Test]
+        public void TestArgumentInfoToString()
+        {
+            var namedArgumentInfo = new NamedArgumentInfo()
+            {
+                LongName = "dll"
+            };
+
+            Assert.That(namedArgumentInfo.ToString(), Is.EqualTo("--dll"));
+
+            namedArgumentInfo.ShortName = 'd';
+            Assert.That(namedArgumentInfo.ToString(), Is.EqualTo("--dll [-d]"));
+        }
+
+        [Test]
         public void TestNamedArgumentsWithValue()
         {
             var args = new string[] { "--input", "input.txt", "--output", "output.txt" };
