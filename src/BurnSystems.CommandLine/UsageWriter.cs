@@ -132,7 +132,7 @@ namespace BurnSystems.CommandLine
         {
             if (width <= 0)
             {
-                width = Console.IsErrorRedirected ? Console.BufferWidth : 80;
+                width = Console.IsErrorRedirected ? 80 : Console.BufferWidth;
             }
 
             var buffer = new StringBuilder();
