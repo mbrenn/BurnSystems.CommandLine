@@ -110,8 +110,7 @@ namespace BurnSystems.CommandLine
                                 "    {0}: {1}",
                                 argument,
                                 argumentInfo.HelpText),
-                        argument.Length + 6,
-                        Console.BufferWidth));
+                        argument.Length + 6));
                 }
                 else
                 {
@@ -129,8 +128,13 @@ namespace BurnSystems.CommandLine
         /// <param name="text">Text to be converted</param>
         /// <param name="indent">Indentation to be done</param>
         /// <returns>Returned the indented text that can be outputed to the console</returns>
-        private string IndentedFormat(string text, int indent, int width)
+        private string IndentedFormat(string text, int indent, int width = 0)
         {
+            if (width <= 0)
+            {
+                width = Console.IsErrorRedirected ? Console.BufferWidth : 80;
+            }
+
             var buffer = new StringBuilder();
 
             // Getsthe text
