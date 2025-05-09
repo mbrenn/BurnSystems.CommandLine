@@ -45,7 +45,6 @@ build/
 *.vssscc
 .builds
 *.pidb
-*.log
 *.scc
 
 # Visual C++ cache files
@@ -156,9 +155,37 @@ $RECYCLE.BIN/
 
 # Mac desktop service store files
 .DS_Store
+/src/.vs/config/applicationhost.config
+/src/DatenMeister.SourceGeneration.Console/uml.cs
+/src/DatenMeister.SourceGeneration.Console/primitivetypes.cs
+/src/DatenMeister.SourceGeneration.Console/mof.cs
+/src/DatenMeister.SourceGeneration.Console/FillTheUML.cs
+/src/DatenMeister.SourceGeneration.Console/FillThePrimitiveTypes.cs
+/src/DatenMeister.SourceGeneration.Console/FillTheMOF.cs
+/nuget-packages/All
+/src/scripts/assembly/*.pdb
+/src/scripts/assembly/*.dll
+
+project.lock.json
+*.js.map
+/src/DatenMeister.Web.Application/App_Data/Database
+/src/.vs
+/src/DatenMeister.Web.Application/htdocs/img/icons
+/modules/DatenMeister.Icons
+src/.idea/*
+/docs/.compile/*
+/deliverables/*
+/src/tests/ScriptTests/tmp/*
+/src/tests/ScriptTests/tmp2/*
+/scripts/cscript/tmp/*
+_framework/
+
+node_modules/
 
 
-examples/bin/*.dll
-examples/bin/*.exe
-dist/*.zip
-*.nupkg
+nugets/*.snupkg
+nugets/*.nupkg
+package-lock.json
+
+.nyc_output/
+Cake.Npm.5.0.0

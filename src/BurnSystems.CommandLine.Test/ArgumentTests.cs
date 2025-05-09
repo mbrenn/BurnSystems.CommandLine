@@ -1,10 +1,5 @@
 ﻿using NUnit.Framework;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BurnSystems.CommandLine.Test
 {
@@ -28,7 +23,7 @@ namespace BurnSystems.CommandLine.Test
         [Test]
         public void TestNamedArgumentsWithValue()
         {
-            var args = new string[] { "--input", "input.txt", "--output", "output.txt" };
+            var args = new[] { "--input", "input.txt", "--output", "output.txt" };
             var evaluator = new Parser(args)
                  .WithArgument("input", hasValue: true)
                  .WithArgument("output", hasValue: true);
@@ -43,7 +38,7 @@ namespace BurnSystems.CommandLine.Test
         [Test]
         public void TestShortName()
         {
-            var args = new string[] { "-i", "input.txt", "-o", "output.txt" };
+            var args = new[] { "-i", "input.txt", "-o", "output.txt" };
             var evaluator = new Parser(args)
                 .WithArgument("input", hasValue: true, shortName: 'i')
                 .WithArgument("output", hasValue: true, shortName: 'o');
@@ -58,7 +53,7 @@ namespace BurnSystems.CommandLine.Test
         [Test]
         public void TestIncompleteNamedAndUnnamedArguments()
         {
-            var args = new string[] { "--input", "input.txt", "--output" };
+            var args = new[] { "--input", "input.txt", "--output" };
             var evaluator = new Parser(args)
                  .WithArgument("input", hasValue: true)
                  .WithArgument("output", hasValue: true);
@@ -68,20 +63,18 @@ namespace BurnSystems.CommandLine.Test
         [Test]
         public void TestUsageWithNamedArgument()
         {
-            var args = new string[] { "--input", "input.txt", "--output" };
+            var args = new[] { "--input", "input.txt", "--output" };
             var evaluator = new Parser(args)
                 .WithArgument("input", hasValue: true, helpText: "Secret")
                 .WithArgument("output", hasValue: true);
 
-            using (var writer = new StringWriter())
-            {
-                new UsageWriter(evaluator).WriteUsage(writer);
+            using var writer = new StringWriter();
+            new UsageWriter(evaluator).WriteUsage(writer);
                 
-                var usageText = writer.GetStringBuilder().ToString();
-                Assert.That(usageText.Contains("input"), Is.True);
-                Assert.That(usageText.Contains("output"), Is.True);
-                Assert.That(usageText.Contains("Secret"), Is.True);
-            }
+            var usageText = writer.GetStringBuilder().ToString();
+            Assert.That(usageText.Contains("input"), Is.True);
+            Assert.That(usageText.Contains("output"), Is.True);
+            Assert.That(usageText.Contains("Secret"), Is.True);
         }
 
         [Test]
@@ -92,28 +85,24 @@ namespace BurnSystems.CommandLine.Test
                 .WithArgument(1, helpText: "Secret")
                 .WithArgument(2);
 
-            using (var writer = new StringWriter())
-            {
-                new UsageWriter(evaluator).WriteUsage(writer);
+            using var writer = new StringWriter();
+            new UsageWriter(evaluator).WriteUsage(writer);
 
-                var usageText = writer.GetStringBuilder().ToString();
-                Assert.That(usageText.Contains("Secret"), Is.True);
-            }
+            var usageText = writer.GetStringBuilder().ToString();
+            Assert.That(usageText.Contains("Secret"), Is.True);
         }
 
         [Test]
         public void TestUsageWithNoArgument()
         {
-            var args = new string[] { "--input", "input.txt", "--output" };
+            var args = new[] { "--input", "input.txt", "--output" };
             var evaluator = new Parser(args);
 
-            using (var writer = new StringWriter())
-            {
-                new UsageWriter(evaluator).WriteUsage(writer);
+            using var writer = new StringWriter();
+            new UsageWriter(evaluator).WriteUsage(writer);
 
-                var usageText = writer.GetStringBuilder().ToString();
-                Assert.That(usageText.Length, Is.GreaterThan(0));
-            }
+            var usageText = writer.GetStringBuilder().ToString();
+            Assert.That(usageText.Length, Is.GreaterThan(0));
         }
     }
 }

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 
 namespace BurnSystems.CommandLine
 {
@@ -36,10 +33,7 @@ namespace BurnSystems.CommandLine
                     continue;
                 }
 
-                var namedArgument = argument as NamedArgumentInfo;
-                var unnamedArgument = argument as UnnamedArgumentInfo;
-
-                if (namedArgument != null)
+                if (argument is NamedArgumentInfo namedArgument)
                 {
                     if (!evaluator.NamedArguments.ContainsKey(namedArgument.LongName))
                     {
@@ -48,7 +42,7 @@ namespace BurnSystems.CommandLine
                     }
                 }
 
-                if (unnamedArgument != null)
+                if (argument is UnnamedArgumentInfo unnamedArgument)
                 {
                     if (unnamedArgument.Index >= evaluator.UnnamedArguments.Count
                         && !maxArgumentsExceptionGiven)
@@ -63,15 +57,12 @@ namespace BurnSystems.CommandLine
                         if (maxIndex == 0)
                         {
                             evaluator.AddError(
-                                string.Format(
-                                    "Not enough arguments were given. 1 argument was expected"));
+                                "Not enough arguments were given. 1 argument was expected");
                         }
                         else
                         {
                             evaluator.AddError(
-                                string.Format(
-                                    "Not enough arguments were given. {0} arguments were expected",
-                                    maxIndex + 1));
+                                $"Not enough arguments were given. {maxIndex + 1} arguments were expected");
                         }
                     }
                 }

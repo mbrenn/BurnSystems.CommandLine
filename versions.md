@@ -1,5 +1,9 @@
 # Versions
 
+## Version 1.2 
+
+- Migration to .Net 9.0
+
 ## Version 1.1
 
 - Release of attribute driven setting of properties via .Net Reflection

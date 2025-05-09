@@ -1,11 +1,9 @@
 ﻿using BurnSystems.CommandLine.Helper;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace BurnSystems.CommandLine
 {
@@ -34,14 +32,12 @@ namespace BurnSystems.CommandLine
         /// <param name="exc">Exception being used</param>
         internal void ShowUsageAndException()
         {
-            using (var writer = new StringWriter())
-            {
-                this.WriteIntroduction(writer);
-                this.WriteErrors(writer);
-                this.WriteUsage(writer);
+            using var writer = new StringWriter();
+            WriteIntroduction(writer);
+            WriteErrors(writer);
+            WriteUsage(writer);
 
-                Console.WriteLine(writer.GetStringBuilder().ToString());
-            }
+            Console.WriteLine(writer.GetStringBuilder().ToString());
         }
 
         /// <summary>
@@ -49,20 +45,18 @@ namespace BurnSystems.CommandLine
         /// </summary>
         internal void ShowUsage()
         {
-            using (var writer = new StringWriter())
-            {
-                this.WriteIntroduction(writer);
-                this.WriteUsage(writer);
+            using var writer = new StringWriter();
+            WriteIntroduction(writer);
+            WriteUsage(writer);
 
-                Console.WriteLine(writer.GetStringBuilder().ToString());
-            }
+            Console.WriteLine(writer.GetStringBuilder().ToString());
         }
 
         internal void WriteIntroduction(TextWriter writer)
         {
             var options = string.Empty;
 
-            if (this.parser.ArgumentInfos.Count() > 0)
+            if (parser.ArgumentInfos.Any())
             {
                 options = " {options}";
             }
@@ -86,10 +80,10 @@ namespace BurnSystems.CommandLine
             writer.WriteLine("Options: ");
 
             // Finds the maximum length of the argument
-            var argumentInfos = this.parser.ArgumentInfos.ToList();
+            var argumentInfos = parser.ArgumentInfos.ToList();
             int maxLength = 0;
 
-            if (argumentInfos.Count() > 0)
+            if (argumentInfos.Any())
             {
                 maxLength =
                     Math.Max(
@@ -103,7 +97,7 @@ namespace BurnSystems.CommandLine
             {
                 if (!string.IsNullOrEmpty(argumentInfo.HelpText))
                 {
-                    var argument = StringManipulation.PaddingRight(argumentInfo.ToString(), maxLength + 3);
+                    var argument = argumentInfo.ToString().PaddingRight(maxLength + 3);
                     writer.WriteLine(
                         IndentedFormat(
                             string.Format(
@@ -115,9 +109,7 @@ namespace BurnSystems.CommandLine
                 else
                 {
                     writer.WriteLine(
-                        string.Format(
-                            "    {0}",
-                            StringManipulation.PaddingRight(argumentInfo.ToString(), maxLength + 3)));
+                        $"    {argumentInfo.ToString().PaddingRight(maxLength + 3)}");
                 }
             }
         }
@@ -177,13 +169,13 @@ namespace BurnSystems.CommandLine
         /// <param name="writer">Writer to be used</param>
         public void WriteErrors(TextWriter writer)
         {
-            if (this.parser.Errors.Count > 0)
+            if (parser.Errors.Count > 0)
             {
                 writer.WriteLine();
                 writer.WriteLine("The given arguments were incomplete:");
             }
 
-            foreach (var error in this.parser.Errors)
+            foreach (var error in parser.Errors)
             {
                 writer.WriteLine("  " + error);
             }

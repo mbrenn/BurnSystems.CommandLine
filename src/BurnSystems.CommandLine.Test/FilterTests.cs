@@ -1,9 +1,5 @@
 ﻿using NUnit.Framework;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BurnSystems.CommandLine.Test
 {
@@ -13,7 +9,7 @@ namespace BurnSystems.CommandLine.Test
         [Test]
         public void TestOptional()
         {
-            var arguments = new string[] { "-f", "file1.txt" };
+            var arguments = new[] { "-f", "file1.txt" };
             var evaluator = new Parser(arguments)
                 .WithArgument("g", defaultValue: "great");
 
@@ -28,7 +24,7 @@ namespace BurnSystems.CommandLine.Test
         [Test]
         public void TestRequiredSuccess()
         {
-            var arguments = new string[] { "-f", "file1.txt" };
+            var arguments = new[] { "-f", "file1.txt" };
             var evaluator = new Parser(arguments)
                 .WithArgument("f", isRequired: true);
 
@@ -42,7 +38,7 @@ namespace BurnSystems.CommandLine.Test
         [Test]
         public void TestRequiredFailNamedArgument()
         {
-            var arguments = new string[] { "-f", "file1.txt" };
+            var arguments = new[] { "-f", "file1.txt" };
             var evaluator = new Parser(arguments)
                 .WithArgument("g", isRequired: true);
 
@@ -52,7 +48,7 @@ namespace BurnSystems.CommandLine.Test
         [Test]
         public void TestRequiredRequire1ExistingUnnamedArgument()
         {
-            var arguments = new string[] { "-f", "file1.txt" };
+            var arguments = new[] { "-f", "file1.txt" };
             var evaluator = new Parser(arguments)
                 .WithArgument(1, isRequired: true);
 
@@ -65,7 +61,7 @@ namespace BurnSystems.CommandLine.Test
         [Test]
         public void TestRequiredRequire1NonExistingUnnamedArgument()
         {
-            var arguments = new string[] { "-f", "file1.txt" };
+            var arguments = new[] { "-f", "file1.txt" };
             var evaluator = new Parser(arguments)
                 .WithArgument(2, isRequired: true);
 
@@ -75,7 +71,7 @@ namespace BurnSystems.CommandLine.Test
         [Test]
         public void TestRequiredFailNamedArgumentWithValue()
         {
-            var arguments = new string[] { "-f", "file1.txt" };
+            var arguments = new[] { "-f", "file1.txt" };
             var evaluator = new Parser(arguments)
                 .WithArgument("f", hasValue: true)
                 .WithArgument(1, isRequired: true);

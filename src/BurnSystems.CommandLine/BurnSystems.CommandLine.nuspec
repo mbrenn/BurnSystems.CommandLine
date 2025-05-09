@@ -12,7 +12,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
     <releaseNotes>First release</releaseNotes>
-    <copyright>Copyright 2015</copyright>
+    <copyright>MIT Licence</copyright>
     <tags>Commandlineparser Commandline Arguments Argument Console</tags>
   </metadata>
 </package>

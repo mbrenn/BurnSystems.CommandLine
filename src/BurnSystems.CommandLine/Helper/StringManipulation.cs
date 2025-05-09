@@ -62,7 +62,7 @@ namespace BurnSystems.CommandLine.Helper
         /// <param name="paddingValue">Zeichen, das hinzugefügt werden soll. </param>
         /// <returns>Aufgefüllter String. Ist der String länger als <c>nLength</c>,
         /// so wird ein gekürzter String zurückgegeben. </returns>
-        public static string PaddingLeft(this string value, int length, char paddingValue)
+        public static string PaddingLeft(this string value, int length, char paddingValue = ' ')
         {
             var stringLength = value.Length;
 
@@ -85,19 +85,6 @@ namespace BurnSystems.CommandLine.Helper
 
             builder.Append(value);
             return builder.ToString();
-        }
-
-        /// <summary>
-        /// Fügt an den Anfang des Strings solange Leerzeichen
-        /// hinzu bis der String die Länge <c>length</c> erreicht.
-        /// </summary>
-        /// <param name="value">String, der geändert werden soll</param>
-        /// <param name="length">Länge des Strings</param>
-        /// <returns>Aufgefüllter String. Ist der String länger als <c>length</c>,
-        /// so wird ein gekürzter String zurückgegeben. </returns>
-        public static string PaddingLeft(this string value, int length)
-        {
-            return PaddingLeft(value, length, ' ');
         }
     }
 }

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace BurnSystems.CommandLine
+﻿namespace BurnSystems.CommandLine
 {
     /// <summary>
     /// Defines an optional argument
@@ -13,8 +8,6 @@ namespace BurnSystems.CommandLine
         /// <summary>
         /// Initializes the optional argument for commandline evaluator
         /// </summary>
-        /// <param name="name">Name of the argument</param>
-        /// <param name="value">Value, if argument is not set</param>
         public DefaultValueFilter()
         {
         }

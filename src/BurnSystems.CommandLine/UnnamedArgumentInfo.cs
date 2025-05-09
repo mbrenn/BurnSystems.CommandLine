@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BurnSystems.CommandLine
+﻿namespace BurnSystems.CommandLine
 {
     /// <summary>
     /// Stores the information to a specific argument, 
@@ -24,7 +18,7 @@ namespace BurnSystems.CommandLine
 
         public override string ToString()
         {
-            return string.Format("Argument {0}", this.Index + 1);
+            return $"Argument {Index + 1}";
         }
     }
 }

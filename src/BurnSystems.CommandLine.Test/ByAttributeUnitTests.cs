@@ -1,10 +1,6 @@
 ﻿using BurnSystems.CommandLine.ByAttributes;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BurnSystems.CommandLine.Test
 {
@@ -20,11 +16,13 @@ namespace BurnSystems.CommandLine.Test
 
             Assert.That(parser, Is.Not.Null);
 
-            var infos = parser.ArgumentInfos;
+            var infos = parser.ArgumentInfos.ToList();
             Assert.That(infos.Count(), Is.EqualTo(2));
 
-            var namedArgumentInfos = infos.Where(x => x is NamedArgumentInfo);
-            var unnamedArgumentInfos = infos.Where(x => x is UnnamedArgumentInfo);
+            var namedArgumentInfos =
+                infos.Where(x => x is NamedArgumentInfo).ToList();
+            var unnamedArgumentInfos = 
+                infos.Where(x => x is UnnamedArgumentInfo).ToList();
 
             Assert.That(unnamedArgumentInfos.Count(), Is.EqualTo(1));
             Assert.That(namedArgumentInfos.Count(), Is.EqualTo(1));
@@ -32,9 +30,11 @@ namespace BurnSystems.CommandLine.Test
             var namedArgument = namedArgumentInfos.First() as NamedArgumentInfo;
             var unnamedArgument = unnamedArgumentInfos.First() as UnnamedArgumentInfo;
 
+            Assert.That(namedArgument, Is.Not.Null);
             Assert.That(namedArgument.ShortName, Is.EqualTo('v'));
             Assert.That(namedArgument.DefaultValue, Is.EqualTo("1"));
             Assert.That(namedArgument.HelpText, Is.EqualTo("Input text"));
+            Assert.That(unnamedArgument, Is.Not.Null);
             Assert.That(unnamedArgument.Index, Is.EqualTo(1));
             Assert.That(unnamedArgument.DefaultValue, Is.EqualTo("Default Value"));
             Assert.That(unnamedArgument.HelpText, Is.EqualTo("Input text"));
@@ -43,7 +43,7 @@ namespace BurnSystems.CommandLine.Test
         [Test]
         public void TestUnnamedParmeters()
         {
-            var args = new string[] { "input", "output" };
+            var args = new[] { "input", "output" };
 
             var attributeParser = new ByAttributeParser<TwoUnnamedParameters>();
             var parser = attributeParser.PrepareParser(args);
@@ -59,7 +59,7 @@ namespace BurnSystems.CommandLine.Test
             Assert.That(result.Output, Is.EqualTo("output"));
 
             // Try to provoke an error
-            args = new string[] { };
+            args = [];
             attributeParser = new ByAttributeParser<TwoUnnamedParameters>();
             parser = attributeParser.PrepareParser(args);
             var parseResult = parser.ParseOrShowUsage();

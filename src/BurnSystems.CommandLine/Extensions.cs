@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BurnSystems.CommandLine
 {
@@ -41,13 +37,15 @@ namespace BurnSystems.CommandLine
             char shortName = '\0', 
             bool isRequired = false)
         {
-            var argument = new NamedArgumentInfo();
-            argument.LongName = name;
-            argument.ShortName = shortName;
-            argument.IsRequired = isRequired;
-            argument.HasValue = hasValue;
-            argument.HelpText = helpText;
-            argument.DefaultValue = defaultValue;
+            var argument = new NamedArgumentInfo
+            {
+                LongName = name,
+                ShortName = shortName,
+                IsRequired = isRequired,
+                HasValue = hasValue,
+                HelpText = helpText,
+                DefaultValue = defaultValue
+            };
 
             parser.AddArgumentInfo(argument);
 
@@ -70,55 +68,17 @@ namespace BurnSystems.CommandLine
             string defaultValue = null,
             bool isRequired = false)
         {
-            var argument = new UnnamedArgumentInfo();
-            argument.Index = index;
-            argument.IsRequired = isRequired;
-            argument.HelpText = helpText;
-            argument.DefaultValue = defaultValue;
+            var argument = new UnnamedArgumentInfo
+            {
+                Index = index,
+                IsRequired = isRequired,
+                HelpText = helpText,
+                DefaultValue = defaultValue
+            };
 
             parser.AddArgumentInfo(argument);
 
             return parser;
-        }
-
-        [Obsolete("Use WithArgument")]
-        public static Parser WithDefaultValue(this Parser evaluator, string name, string value)
-        {
-            WithArgument(evaluator,
-                name,
-                defaultValue: value);
-
-            return evaluator;
-        }
-
-        [Obsolete("Use WithArgument")]
-        public static Parser WithDefaultValue(this Parser evaluator, int index, string value)
-        {
-            WithArgument(evaluator,
-                index,
-                defaultValue: value);
-
-            return evaluator;
-        }
-
-        [Obsolete("Use WithArgument")]
-        public static Parser Requires(this Parser evaluator, string name)
-        {
-            WithArgument(evaluator,
-                name,
-                isRequired: true);
-
-            return evaluator;
-        }
-
-        [Obsolete("Use WithArgument")]
-        public static Parser Requires(this Parser evaluator, int index)
-        {
-            WithArgument(evaluator,
-                index,
-                isRequired: true);
-
-            return evaluator;
         }
     }
 }

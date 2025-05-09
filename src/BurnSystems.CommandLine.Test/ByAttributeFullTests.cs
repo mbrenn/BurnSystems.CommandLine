@@ -1,10 +1,5 @@
 ﻿using BurnSystems.CommandLine.ByAttributes;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BurnSystems.CommandLine.Test
 {
@@ -14,7 +9,7 @@ namespace BurnSystems.CommandLine.Test
         [Test]
         public void TestNoAttributes()
         {
-            var args = new string[] { "--Input", "input.txt", "--Output", "output.txt" };
+            var args = new[] { "--Input", "input.txt", "--Output", "output.txt" };
 
             var result = Parser.ParseIntoOrShowUsage<NoAttributes>(args);
             Assert.That(result, Is.Not.Null);
@@ -23,7 +18,7 @@ namespace BurnSystems.CommandLine.Test
             Assert.That(result.Input, Is.EqualTo("input.txt"));
             Assert.That(result.Output, Is.EqualTo("output.txt"));
 
-            args = new string[] { "--Input", "input.txt", "--Output", "output.txt", "--Verbose" };
+            args = ["--Input", "input.txt", "--Output", "output.txt", "--Verbose"];
 
             result = Parser.ParseIntoOrShowUsage<NoAttributes>(args);
             Assert.That(result, Is.Not.Null);
@@ -36,7 +31,7 @@ namespace BurnSystems.CommandLine.Test
         [Test]
         public void TestSmallLettersAttributes()
         {
-            var args = new string[] { "--input", "input.txt", "--output", "output.txt" };
+            var args = new[] { "--input", "input.txt", "--output", "output.txt" };
 
             var result = Parser.ParseIntoOrShowUsage<NoAttributes>(args);
             Assert.That(result, Is.Not.Null);
@@ -45,7 +40,7 @@ namespace BurnSystems.CommandLine.Test
             Assert.That(result.Input, Is.EqualTo("input.txt"));
             Assert.That(result.Output, Is.EqualTo("output.txt"));
 
-            args = new string[] { "--input", "input.txt", "--output", "output.txt", "--Verbose" };
+            args = new[] { "--input", "input.txt", "--output", "output.txt", "--Verbose" };
 
             result = Parser.ParseIntoOrShowUsage<NoAttributes>(args);
             Assert.That(result, Is.Not.Null);
@@ -58,7 +53,7 @@ namespace BurnSystems.CommandLine.Test
         [Test]
         public void TestNoAttributesWithShortName()
         {
-            var args = new string[] { "--Input", "input.txt", "--Output", "output.txt", "-vf" };
+            var args = new[] { "--Input", "input.txt", "--Output", "output.txt", "-vf" };
 
             var result = Parser.ParseIntoOrShowUsage<AttributesShortName>(args);
             Assert.That(result, Is.Not.Null);
@@ -67,7 +62,7 @@ namespace BurnSystems.CommandLine.Test
             Assert.That(result.Input, Is.EqualTo("input.txt"));
             Assert.That(result.Output, Is.EqualTo("output.txt"));
 
-            args = new string[] { "--Input", "input.txt", "--Output", "output.txt", "-f" };
+            args = new[] { "--Input", "input.txt", "--Output", "output.txt", "-f" };
 
             result = Parser.ParseIntoOrShowUsage<AttributesShortName>(args);
             Assert.That(result, Is.Not.Null);
@@ -80,7 +75,7 @@ namespace BurnSystems.CommandLine.Test
         [Test]
         public void TestNoAttributesWithDefaultValue()
         {
-            var args = new string[] { "--Input", "input.txt", "-vf" };
+            var args = new[] { "--Input", "input.txt", "-vf" };
 
             var result = Parser.ParseIntoOrShowUsage<AttributesDefaultValue>(args);
             Assert.That(result, Is.Not.Null);
@@ -89,7 +84,7 @@ namespace BurnSystems.CommandLine.Test
             Assert.That(result.Input, Is.EqualTo("input.txt"));
             Assert.That(result.Output, Is.EqualTo("no.txt"));
 
-            args = new string[] { "--Input", "input.txt", "--Output", "output.txt", "-f" };
+            args = new[] { "--Input", "input.txt", "--Output", "output.txt", "-f" };
 
             result = Parser.ParseIntoOrShowUsage<AttributesDefaultValue>(args);
             Assert.That(result, Is.Not.Null);
@@ -102,7 +97,7 @@ namespace BurnSystems.CommandLine.Test
         [Test]
         public void TestUnnamedArgumentAttribute()
         {
-            var args = new string[] { "input.txt", "output.txt", "-vf" };
+            var args = new[] { "input.txt", "output.txt", "-vf" };
             var result = Parser.ParseIntoOrShowUsage<UnnamedArguments>(args);
             Assert.That(result, Is.Not.Null);
             Assert.That(result.FullDetail, Is.True);
@@ -110,7 +105,7 @@ namespace BurnSystems.CommandLine.Test
             Assert.That(result.Input, Is.EqualTo("input.txt"));
             Assert.That(result.Output, Is.EqualTo("output.txt"));
 
-            args = new string[] { "input.txt", "-f" };
+            args = new[] { "input.txt", "-f" };
             result = Parser.ParseIntoOrShowUsage<UnnamedArguments>(args);
             Assert.That(result, Is.Not.Null);
             Assert.That(result.FullDetail, Is.True);
@@ -118,7 +113,7 @@ namespace BurnSystems.CommandLine.Test
             Assert.That(result.Input, Is.EqualTo("input.txt"));
             Assert.That(result.Output, Is.Null.Or.Empty);
 
-            args = new string[] { "input.txt", "-v" };
+            args = new[] { "input.txt", "-v" };
             result = Parser.ParseIntoOrShowUsage<UnnamedArguments>(args);
             Assert.That(result, Is.Not.Null);
             Assert.That(result.FullDetail, Is.False);
@@ -126,7 +121,7 @@ namespace BurnSystems.CommandLine.Test
             Assert.That(result.Input, Is.EqualTo("input.txt"));
             Assert.That(result.Output, Is.Null.Or.Empty);
 
-            args = new string[] { "-f" };
+            args = new[] { "-f" };
             result = Parser.ParseIntoOrShowUsage<UnnamedArguments>(args);
             Assert.That(result, Is.Null);
         }
@@ -169,7 +164,6 @@ namespace BurnSystems.CommandLine.Test
             public bool FullDetail { get; set; }
         }
 
-        [TestFixture]
         public class UnnamedArguments
         {
             [UnnamedArgument(Index = 0, IsRequired = true)]

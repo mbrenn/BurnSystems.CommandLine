@@ -1,15 +1,11 @@
 
 namespace BurnSystems.CommandLine
 {
-    using BurnSystems.CommandLine.ByAttributes;
-    using BurnSystems.CommandLine.Helper;
+    using ByAttributes;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
-    using System.IO;
     using System.Linq;
-    using System.Reflection;
-    using System.Text;
 
     /// <summary>
     /// Evaluates the command line
@@ -24,25 +20,22 @@ namespace BurnSystems.CommandLine
         /// <summary>
         /// Nichtbenannte Argument
         /// </summary>
-        private List<string> unnamedArguments =
-            new List<string>();
+        private List<string> unnamedArguments = new();
 
         /// <summary>
         /// Stores the argument information
         /// </summary>
-        private List<ArgumentInfo> argumentInfos = new List<ArgumentInfo>();
+        private List<ArgumentInfo> argumentInfos = new();
 
         /// <summary>
         /// Named arguments
         /// </summary>
-        private Dictionary<string, string> namedArguments =
-            new Dictionary<string, string>();
+        private Dictionary<string, string> namedArguments = new();
 
         /// <summary>
         /// Stores the definitions, which will be replaced
         /// </summary>
-        private List<ICommandLineFilter> filters =
-            new List<ICommandLineFilter>();
+        private List<ICommandLineFilter> filters = new();
 
         /// <summary>
         /// Stores the value whether the parsing already had been executed
@@ -57,23 +50,17 @@ namespace BurnSystems.CommandLine
         /// <summary>
         /// Stores the errors which were created during parsing
         /// </summary>
-        private List<string> errors = new List<string>();
+        private List<string> errors = new();
 
         /// <summary>
         /// Gets the errors which occured during parsing
         /// </summary>
-        internal List<string> Errors
-        {
-            get { return this.errors; }
-        }
+        internal List<string> Errors => errors;
 
         /// <summary>
         /// Returns the argument information
         /// </summary>
-        internal IEnumerable<ArgumentInfo> ArgumentInfos
-        {
-            get { return this.argumentInfos; }
-        }
+        internal IEnumerable<ArgumentInfo> ArgumentInfos => argumentInfos;
 
         /// <summary>
         /// Gets all argument infos, which describe the named arguments
@@ -82,7 +69,7 @@ namespace BurnSystems.CommandLine
         {
             get
             {
-                return this.ArgumentInfos
+                return ArgumentInfos
                     .Select(x => x as NamedArgumentInfo)
                     .Where(x => x != null);
             }
@@ -95,7 +82,7 @@ namespace BurnSystems.CommandLine
         {
             get
             {
-                return this.ArgumentInfos
+                return ArgumentInfos
                     .Select(x => x as UnnamedArgumentInfo)
                     .Where(x => x != null);
             }
@@ -108,12 +95,12 @@ namespace BurnSystems.CommandLine
         {
             get
             {
-                if (!this.isParsed)
+                if (!isParsed)
                 {
-                    this.Parse();
+                    Parse();
                 }
 
-                return this.unnamedArguments;
+                return unnamedArguments;
             }
         }
 
@@ -124,12 +111,12 @@ namespace BurnSystems.CommandLine
         {
             get
             {
-                if (!this.isParsed)
+                if (!isParsed)
                 {
-                    this.Parse();
+                    Parse();
                 }
 
-                return this.namedArguments;
+                return namedArguments;
             }
         }
 
@@ -172,10 +159,10 @@ namespace BurnSystems.CommandLine
 
             this.arguments = arguments;
 
-            this.usageWriter = new UsageWriter(this);
+            usageWriter = new UsageWriter(this);
 
-            this.filters.Add(new DefaultValueFilter());
-            this.filters.Add(new RequiredFilter());
+            filters.Add(new DefaultValueFilter());
+            filters.Add(new RequiredFilter());
         }
 
         /// <summary>
@@ -188,7 +175,7 @@ namespace BurnSystems.CommandLine
         {
             if (definitions != null)
             {
-                this.filters.AddRange(definitions);
+                filters.AddRange(definitions);
             }
         }
 
@@ -198,7 +185,7 @@ namespace BurnSystems.CommandLine
         /// <param name="info">Information to be added</param>
         internal void AddArgumentInfo(ArgumentInfo info)
         {
-            this.argumentInfos.Add(info);
+            argumentInfos.Add(info);
         }
 
         /// <summary>
@@ -208,7 +195,7 @@ namespace BurnSystems.CommandLine
         /// <param name="filter"></param>
         public void AddFilter(ICommandLineFilter filter)
         {
-            this.filters.Add(filter);
+            filters.Add(filter);
         }
 
         /// <summary>
@@ -218,9 +205,9 @@ namespace BurnSystems.CommandLine
         /// <returns>True, when parsing was successful</returns>
         public bool ParseOrShowUsage()
         {
-            this.Parse();
+            Parse();
 
-            return !this.ShowUsageIfNecessary();
+            return !ShowUsageIfNecessary();
         }
 
         /// <summary>
@@ -230,17 +217,17 @@ namespace BurnSystems.CommandLine
         /// <returns>true, if no usage was shown</returns>
         private bool ShowUsageIfNecessary()
         {
-            if (this.errors.Count > 0)
+            if (errors.Count > 0)
             {
-                this.usageWriter.ShowUsageAndException();
+                usageWriter.ShowUsageAndException();
                 return true;
             }
 
-            if (this.NamedArguments.ContainsKey("help")
-                || this.NamedArguments.ContainsKey("h")
-                || this.NamedArguments.ContainsKey("?"))
+            if (NamedArguments.ContainsKey("help")
+                || NamedArguments.ContainsKey("h")
+                || NamedArguments.ContainsKey("?"))
             {
-                this.usageWriter.ShowUsage();
+                usageWriter.ShowUsage();
                 return true;
             }
 
@@ -252,12 +239,12 @@ namespace BurnSystems.CommandLine
         /// </summary>
         private void CheckForErrors()
         {
-            if (!this.isParsed)
+            if (!isParsed)
             {
                 throw new InvalidOperationException("ParseOrShowUsage() is not called");
             }
 
-            if (this.errors.Count > 0)
+            if (errors.Count > 0)
             {
                 throw new InvalidOperationException("Errors occured during parsing");
             }
@@ -269,12 +256,12 @@ namespace BurnSystems.CommandLine
         /// <param name="arguments">Arguments to be parsed</param>
         private void Parse()
         {
-            if (this.isParsed)
+            if (isParsed)
             {
                 throw new InvalidOperationException("The arguments have been parsed already");
             }
 
-            this.isParsed = true;
+            isParsed = true;
 
             foreach (var filter in filters)
             {
@@ -302,12 +289,12 @@ namespace BurnSystems.CommandLine
                     // Short argument
                     var argumentName = argument.Substring(1);
 
-                    this.ParseSingleDashOption(ref n, argumentName);
+                    ParseSingleDashOption(ref n, argumentName);
                 }
                 else
                 {
                     // No single-dash or multi-dash line
-                    this.unnamedArguments.Add(argument);
+                    unnamedArguments.Add(argument);
                 }
             }
 
@@ -328,26 +315,26 @@ namespace BurnSystems.CommandLine
             foreach (var cChar in argumentName)
             {
                 // Check, if we have a mapping to a long name
-                var info = this.NamedArgumentInfos.Where(x => x.ShortName == cChar).FirstOrDefault();
+                var info = NamedArgumentInfos.FirstOrDefault(x => x.ShortName == cChar);
                 if (info == null)
                 {
                     // No, we don't have a mapping
-                    this.NamedArguments[argumentName] = "1";
+                    NamedArguments[argumentName] = "1";
                 }
                 else if (!info.HasValue)
                 {
                     // We have a mapping, but we have no value, so default to "1"
-                    this.NamedArguments[info.LongName] = "1";
+                    NamedArguments[info.LongName] = "1";
                 }
                 else
                 {
                     // We have a mapping and a value, so the option shall be the only option
                     if (argumentName.Length > 1)
                     {
-                        this.AddError("Shortname " + cChar + " has a value and is used with other options");
+                        AddError("Shortname " + cChar + " has a value and is used with other options");
                     }
 
-                    this.AddValueToNamedArgument(ref n, info.LongName);
+                    AddValueToNamedArgument(ref n, info.LongName);
                 }
             }
 
@@ -364,27 +351,27 @@ namespace BurnSystems.CommandLine
         {
             // Supports the named arguments with values
             var info =
-                this.NamedArgumentInfos.Where(x => x.LongName.ToLower() == argumentName.ToLower()).FirstOrDefault();
+                NamedArgumentInfos.FirstOrDefault(x => x.LongName.ToLower() == argumentName.ToLower());
 
             if (info == null)
             {
-                this.namedArguments[argumentName] = "1";
+                namedArguments[argumentName] = "1";
             }
             else if (!info.HasValue)
             {
-                this.namedArguments[info.LongName] = "1";
+                namedArguments[info.LongName] = "1";
             }
             else
             {
                 n++;
                 if (arguments.Length <= n)
                 {
-                    this.AddError(
+                    AddError(
                         "Value missing for parameter: " + argumentName);
                 }
                 else
                 {
-                    this.namedArguments[info.LongName] = arguments[n];
+                    namedArguments[info.LongName] = arguments[n];
                 }
             }
         }
@@ -395,7 +382,7 @@ namespace BurnSystems.CommandLine
         /// <param name="error">Error to be added</param>
         public void AddError(string error)
         {
-            this.errors.Add(error);
+            errors.Add(error);
         }
     }
 }
