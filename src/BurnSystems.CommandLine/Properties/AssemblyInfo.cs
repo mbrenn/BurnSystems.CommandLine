@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("BurnSystems.CommandLine")]
-[assembly: AssemblyDescription("The command line parser prepeares the arguments to named and unnamed arguments")]
+[assembly: AssemblyDescription("The command line parser prepares the arguments to named and unnamed arguments")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Martin Brenn")]
 [assembly: AssemblyProduct("BurnSystems.CommandLine")]
